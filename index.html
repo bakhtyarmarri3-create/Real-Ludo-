@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ludo Star - Welcome</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(160deg, #3b1f5c, #2a1245 60%, #1c0a30);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    direction: rtl;
+  }
+  .container {
+    width: 420px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  h1 { font-size: 28px; margin-bottom: 20px; color: #f3c623; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  
+  input {
+    width: 100%; padding: 12px 16px; margin: 10px 0;
+    border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.3); color: #fff; font-size: 15px;
+    outline: none; text-align: right;
+  }
+  input:focus { border-color: #f3c623; }
+  
+  button {
+    width: 100%; padding: 14px; margin-top: 15px;
+    border-radius: 12px; border: none;
+    background: #f3c623; color: #1c0a30;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+  }
+  button:active { transform: scale(0.98); }
+  button:hover { background: #ffe066; }
+  
+  .link-text { margin-top: 15px; font-size: 14px; opacity: 0.8; cursor: pointer; color: #5aa8ff; }
+  
+  .dashboard-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(0,0,0,0.4); padding: 12px; border-radius: 14px; margin-bottom: 20px;
+  }
+  .coins-display { display: flex; align-items: center; gap: 6px; font-weight: bold; color: #f3c623; }
+  
+  .mode-card {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 16px; margin: 12px 0; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background 0.2s;
+  }
+  .mode-card:hover { background: rgba(255,255,255,0.15); }
+  .mode-title { font-weight: 700; font-size: 16px; text-align: right; }
+  .mode-desc { font-size: 12px; opacity: 0.7; text-align: right; }
+  .mode-icon { font-size: 28px; }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: #f3c623; color: #000; padding: 10px 20px;
+    border-radius: 10px; font-size: 14px; font-weight: bold;
+    opacity: 0; transition: opacity 0.3s; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+  <h1>🏆 LUDO STAR</h1>
+
+  <div class="screen active" id="signupScreen">
+    <h3>نیا اکاؤنٹ بنائیں</h3>
+    <input type="text" id="signupUser" placeholder="صارف کا نام (Username)">
+    <input type="password" id="signupPass" placeholder="پاس ورڈ (Password)">
+    <button onclick="handleSignup()">رجسٹر کریں (پائیں 5,000 🪙)</button>
+    <div class="link-text" onclick="switchScreen('loginScreen')">پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں</div>
+  </div>
+
+  <div class="screen" id="loginScreen">
+    <h3>لاگ ان کریں</h3>
+    <input type="text" id="loginUser" placeholder="صارف کا نام">
+    <input type="password" id="loginPass" placeholder="پاس ورڈ">
+    <button onclick="handleLogin()">داخل ہوں</button>
+    <div class="link-text" onclick="switchScreen('signupScreen')">نیا اکاؤنٹ بنائیں</div>
+  </div>
+
+  <div class="screen" id="dashboardScreen">
+    <div class="dashboard-header">
+      <span id="playerName" style="font-weight: 700;">صارف</span>
+      <div class="coins-display">💰 <span id="playerCoins">0</span></div>
+    </div>
+
+    <button id="dailyBtn" style="background: #1f9d4e; color:#fff; margin-bottom: 20px;" onclick="claimDailyBonus()">
+      🎁 روزانہ کا بونس حاصل کریں (500 🪙)
+    </button>
+
+    <h3>کھیل کا انتخاب کریں</h3>
+    
+    <div class="mode-card" onclick="startGame('computer')">
+      <div>
+        <div class="mode-title">کمپیوٹر کے ساتھ کھیلیں</div>
+        <div class="mode-desc">آف لائن بوٹس کے ساتھ پریکٹس کریں</div>
+      </div>
+      <div class="mode-icon">🤖</div>
+    </div>
+
+    <div class="mode-card" onclick="startGame('friends')">
+      <div>
+        <div class="mode-title">دوستوں کے ساتھ کھیلیں</div>
+        <div class="mode-desc">ایک ہی اسکرین پر پاس اینڈ پلے</div>
+      </div>
+      <div class="mode-icon">👥</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // لوکل اسٹوریج ڈیٹا بیس مینجمنٹ
+  let users = JSON.parse(localStorage.getItem('ludo_users')) || {};
+  let currentUser = localStorage.getItem('ludo_current_user') || null;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function switchScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  // سائن اپ لاجک (5000 فری کوائنز)
+  function handleSignup() {
+    const user = document.getElementById('signupUser').value.trim();
+    const pass = document.getElementById('signupPass').value.trim();
+    
+    if(!user || !pass) { showToast('براہ کرم تمام معلومات لکھیں'); return; }
+    if(users[user]) { showToast('یہ صارف پہلے سے موجود ہے'); return; }
+    
+    users[user] = { password: pass, coins: 5000, lastBonus: 0 };
+    localStorage.setItem('ludo_users', JSON.stringify(users));
+    showToast('اکاؤنٹ بن گیا! 5000 کوائنز شامل کر دیے گئے');
+    
+    // خودکار لاگ ان
+    loginUser(user);
+  }
+
+  // لاگ ان لاجک
+  function handleLogin() {
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    
+    if(users[user] && users[user].password === pass) {
+      loginUser(user);
+    } else {
+      showToast('غلط صارف نام یا پاس ورڈ');
+    }
+  }
+
+  function loginUser(user) {
+    currentUser = user;
+    localStorage.setItem('ludo_current_user', user);
+    loadDashboard();
+  }
+
+  function loadDashboard() {
+    if(!currentUser) return;
+    document.getElementById('playerName').textContent = currentUser;
+    document.getElementById('playerCoins').textContent = users[currentUser].coins;
+    
+    // چیک کریں کہ کیا آج کا بونس پہلے ہی لے لیا گیا ہے؟
+    const today = new Date().toDateString();
+    if(users[currentUser].lastBonus === today) {
+      document.getElementById('dailyBtn').style.opacity = "0.5";
+      document.getElementById('dailyBtn').innerText = "آج کا بونس لیا جا چکا ہے";
+      document.getElementById('dailyBtn').disabled = true;
+    }
+    
+    switchScreen('dashboardScreen');
+  }
+
+  // روزانہ کا 500 بونس لاجک
+  function claimDailyBonus() {
+    const today = new Date().toDateString();
+    if(users[currentUser].lastBonus === today) {
+      showToast('آپ آج کا بونس لے چکے ہیں!');
+      return;
+    }
+    
+    users[currentUser].coins += 500;
+    users[currentUser].lastBonus = today;
+    localStorage.setItem('ludo_users', JSON.stringify(users));
+    
+    document.getElementById('playerCoins').textContent = users[currentUser].coins;
+    showToast('مبارک ہو! 500 کوائنز شامل ہو گئے 🪙');
+    loadDashboard();
+  }
+
+  // گیم شروع کرنا اور ری ڈائریکٹ کرنا
+  function startGame(mode) {
+    // یہاں آپ چاہیں تو فیس (FEE) بھی کاٹ سکتے ہیں، مثلاً 500 کوائنز انٹری فیس
+    if(users[currentUser].coins < 500) {
+      showToast('کھیلنے کے لیے کم از کم 500 کوائنز ہونا ضروری ہیں!');
+      return;
+    }
+    
+    // کھیل شروع ہونے پر 500 کوائنز کاٹ لیں
+    users[currentUser].coins -= 500;
+    localStorage.setItem('ludo_users', JSON.stringify(users));
+    
+    showToast('گیم لوڈ ہو رہی ہے...');
+    setTimeout(() => {
+      // آپ کے گیم پیج پر ری ڈائریکٹ کرے گا اور موڈ بھی ساتھ بھیجے گا
+      window.location.href = `game.html?mode=${mode}`;
+    }, 1000);
+  }
+
+  // اگر پہلے سے لاگ ان ہو تو ڈائریکٹ ڈیش بورڈ کھولیں
+  window.onload = function() {
+    if(currentUser && users[currentUser]) {
+      loadDashboard();
+    }
+  }
+</script>
+</body>
+</html>
