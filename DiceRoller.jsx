@@ -1,49 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 
-export default function DiceRoller() {
-  const [currentTurn, setCurrentTurn] = useState('RED'); // پہلی باری RED کی
+export default function DiceRoller({ currentTurn, onRollComplete, hasRolled }) {
   const [diceNumber, setDiceNumber] = useState(1);
   const [isRolling, setIsRolling] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10); // 10 سیکنڈ کا ٹائمر
+  const [timeLeft, setTimeLeft] = useState(10); // 10 سیکنڈ کا آن لائن ٹائمر
 
   const spinValue = useRef(new Animated.Value(0)).current;
   const timerRef = useRef(null);
 
-  const playersOrder = ['RED', 'GREEN', 'YELLOW', 'BLUE'];
-
-  // باری تبدیل کرنے کا فنکشن
-  const changeTurn = () => {
-    const nextIndex = (playersOrder.indexOf(currentTurn) + 1) % playersOrder.length;
-    setCurrentTurn(playersOrder[nextIndex]);
-    setTimeLeft(10); // نئے کھلاڑی کے لیے ٹائمر دوبارہ 10 پر سیٹ کریں
-  };
-
-  // ٹائمر کا لاجک (جیسے ہی باری بدلے، ٹائمر شروع ہو جائے)
+  // جیسے ہی کھلاڑی کی باری بدلے، ٹائمر دوبارہ 10 سے شروع ہو جائے
   useEffect(() => {
-    // پرانے ٹائمر کو کلیئر کریں
+    setTimeLeft(10);
+    
     if (timerRef.current) clearInterval(timerRef.current);
 
-    // ہر 1 سیکنڈ بعد ٹائمر کم ہوگا
     timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
-          // اگر 10 سیکنڈ ختم ہو جائیں تو خود بخود اگلی باری
           clearInterval(timerRef.current);
-          changeTurn();
+          // اگر 10 سیکنڈ ختم ہو جائیں اور کھلاڑی رول نہ کرے، تو 0 اسکور کے ساتھ باری تبدیل
+          onRollComplete(0); 
           return 10;
         }
         return prevTime - 1;
       });
     }, 1000);
 
-    // جب کمپوننٹ بند ہو تو ٹائمر صاف ہو جائے
     return () => clearInterval(timerRef.current);
   }, [currentTurn]);
 
-  // چھکا رول کرنے کا لاجک
+  // اگر کھلاڑی نے رول کر دیا ہے تو ٹائمر کو روک دیں
+  useEffect(() => {
+    if (hasRolled && timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  }, [hasRolled]);
+
   const rollDice = () => {
-    if (isRolling) return;
+    if (isRolling || hasRolled) return; // اگر رول ہو چکا ہے یا گھوم رہا ہے تو دوبارہ کلک نہ ہو
 
     setIsRolling(true);
     spinValue.setValue(0);
@@ -57,9 +52,8 @@ export default function DiceRoller() {
       setDiceNumber(newNumber);
       setIsRolling(false);
       
-      // ان لائن گیمز میں ڈائس رول کرنے کے بعد بھی ٹائمر رکتا ہے اور گوٹی چلنے کا وقت ملتا ہے،
-      // لیکن ابھی ہم اگلی باری پر شفٹ کر رہے ہیں
-      changeTurn();
+      // مین فائل (App.jsx) کو رزلٹ بھیجیں
+      onRollComplete(newNumber);
     });
   };
 
@@ -68,19 +62,14 @@ export default function DiceRoller() {
     outputRange: ['0deg', '360deg']
   });
 
-  // موجودہ کھلاڑی کے حساب سے پوزیشن (موبائل اسکرین پر ڈائس کہاں دکھے گا)
+  // کھلاڑی کے حساب سے ڈائس کی پوزیشن (اسکرین کے چاروں کونوں پر)
   const getDicePosition = () => {
     switch (currentTurn) {
-      case 'RED':
-        return { bottom: 20, left: 20 }; // نیچھے بائیں طرف (Red کے پاس)
-      case 'GREEN':
-        return { top: 20, left: 20 };    // اوپر بائیں طرف (Green کے پاس)
-      case 'YELLOW':
-        return { top: 20, right: 20 };   // اوپر دائیں طرف (Yellow کے پاس)
-      case 'BLUE':
-        return { bottom: 20, right: 20 };  // نیچے دائیں طرف (Blue کے پاس)
-      default:
-        return { bottom: 20, left: 20 };
+      case 'RED':    return { bottom: 20, left: 20 };
+      case 'GREEN':  return { top: 20, left: 20 };
+      case 'YELLOW': return { top: 20, right: 20 };
+      case 'BLUE':   return { bottom: 20, right: 20 };
+      default:       return { bottom: 20, left: 20 };
     }
   };
 
@@ -92,58 +81,45 @@ export default function DiceRoller() {
   };
 
   return (
-    <View style={styles.fullScreenContainer}>
-      
-      {/* گیم ایریا جہاں لڈو بورڈ ہوگا (اس کے اوپر اب ایپیسوڈک پوزیشننگ ہوگی) */}
-      <View style={styles.gameZone}>
+    <View style={styles.diceWrapper} pointerEvents="box-none">
+      <View style={[styles.diceContainer, getDicePosition()]}>
         
-        {/* ڈائس کنٹینر جو خود بخود اپنی جگہ بدلے گا */}
-        <View style={[styles.diceWrapper, getDicePosition()]}>
-          
-          {/* چھوٹا ٹائمر انڈیکیٹر */}
+        {/* ٹائمر سرکل */}
+        {!hasRolled && (
           <View style={[styles.timerCircle, { borderColor: getTurnColor() }]}>
             <Text style={styles.timerText}>{timeLeft}s</Text>
           </View>
+        )}
 
-          {/* گھومنے والا ڈائس */}
-          <TouchableOpacity onPress={rollDice} disabled={isRolling} activeOpacity={0.8}>
-            <Animated.View style={[
-              styles.dice, 
-              { borderColor: getTurnColor(), transform: [{ rotate: spin }] }
-            ]}>
-              <Text style={styles.diceText}>{isRolling ? '🌀' : diceNumber}</Text>
-            </Animated.View>
-          </TouchableOpacity>
-          
-          <Text style={[styles.playerName, { color: getTurnColor() }]}>{currentTurn}</Text>
-        </View>
-
+        {/* اینیمیٹڈ چھکا */}
+        <TouchableOpacity onPress={rollDice} disabled={isRolling || hasRolled} activeOpacity={0.8}>
+          <Animated.View style={[
+            styles.dice, 
+            { borderColor: getTurnColor(), transform: [{ rotate: spin }] }
+          ]}>
+            <Text style={styles.diceText}>{isRolling ? '🌀' : diceNumber}</Text>
+          </Animated.View>
+        </TouchableOpacity>
+        
+        <Text style={[styles.playerName, { color: getTurnColor() }]}>{currentTurn}</Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  fullScreenContainer: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    position: 'relative',
-  },
-  gameZone: {
-    flex: 1,
-    position: 'relative',
-    backgroundColor: 'transparent', // یہ لڈو بورڈ کے اوپر اوورلے ہوگا
-  },
   diceWrapper: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 99,
+  },
+  diceContainer: {
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 99,
   },
   dice: {
-    width: 65,
-    height: 65,
+    width: 60,
+    height: 60,
     backgroundColor: '#FFF',
     borderRadius: 12,
     borderWidth: 3,
@@ -156,14 +132,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   diceText: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
   },
   timerCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#333',
     borderWidth: 2,
     justifyContent: 'center',
@@ -172,14 +148,12 @@ const styles = StyleSheet.create({
   },
   timerText: {
     color: '#FFF',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
   },
   playerName: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
-    textTransform: 'uppercase',
   }
 });
-    
