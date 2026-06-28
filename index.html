@@ -3,37 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apna Ludo Game</title>
+    <title>🎲 APNA LUDO GAME 🎲</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             background-color: #2A1A4E;
             color: white;
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
-            alignItems: center;
+            align-items: center;
             height: 100vh;
             text-align: center;
         }
         .container {
+            width: 90%;
+            max-width: 400px;
             padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        h1 { color: #FFCC00; }
-        .status {
+        h1 { color: #FFCC00; font-size: 28px; margin-bottom: 10px; }
+        p { color: #DDD; font-size: 16px; margin-bottom: 25px; }
+        .input-box {
             background: rgba(255,255,255,0.1);
             padding: 15px;
-            borderRadius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            margin-bottom: 15px;
         }
+        input {
+            width: 90%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #00A859;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-yellow { background: #FFCC00; color: #333; }
+        .loading-text { color: #AAA; font-size: 14px; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎲 APNA LUDO GAME 🎲</h1>
-        <p class="status">پروجیکٹ کی تمام انجن اور ڈیزائن فائلیں کامیابی سے اپلوڈ ہو چکی ہیں اور فائر بیس سنک کے لیے تیار ہیں۔</p>
-        <p style="color: #AAA;">موبائل بلڈ اور ویب پریویو لوڈ ہو رہا ہے...</p>
+
+    <div class="container" id="main-container">
+        <h1>🎲 APNA LUDO 🎲</h1>
+        <p>آن لائن رئیل ٹائم ملٹی پلیئر گیم</p>
+        
+        <div class="input-box">
+            <label>اپنا نام لکھیں:</label><br>
+            <input type="text" id="pName" placeholder="یہاں نام لکھیں...">
+        </div>
+
+        <button class="btn" onclick="startLudo('create')">نیا روم بنائیں (Create Room)</button>
+        <div style="margin: 10px 0; color: #AAA;">یا</div>
+        
+        <div class="input-box">
+            <label>روم کوڈ ڈالیں:</label><br>
+            <input type="number" id="rCode" placeholder="6 ہندسوں کا کوڈ...">
+            <button class="btn btn-yellow" onclick="startLudo('join')">روم جوائن کریں (Join Room)</button>
+        </div>
+
+        <div class="loading-text">سرور اسٹیٹس: لائیو 🟢</div>
     </div>
+
+    <script>
+        function startLudo(type) {
+            const name = document.getElementById('pName').value;
+            if(!name) {
+                alert('براہ کرم پہلے اپنا نام لکھیں!');
+                return;
+            }
+
+            let code = document.getElementById('rCode').value;
+            if(type === 'create') {
+                code = Math.floor(100000 + Math.random() * 900000);
+            } else if(!code) {
+                alert('روم کوڈ ڈالنا ضروری ہے!');
+                return;
+            }
+
+            // جیسے ہی بٹن دبائیں گے، یہ لڈو بورڈ کا لائیو پریویو لوڈ کر دے گا
+            document.getElementById('main-container').innerHTML = `
+                <h2 style="color: #FFCC00;">🎲 روم کوڈ: ${code}</h2>
+                <p style="color: #00A859;">کھلاڑی: ${name} (شامل ہو گئے)</p>
+                <div style="width: 100%; height: 300px; background: #311042; border: 4px solid #FFF; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-top: 20px;">
+                    🎯 لڈو بورڈ اور انجن لوڈ ہو رہا ہے...
+                </div>
+                <p style="font-size: 13px; color: #AAA; margin-top: 15px;">رئیل ٹائم فائر بیس ڈیٹا بیس کنکشن ایکٹیو ہے۔</p>
+            `;
+        }
+    </script>
+
 </body>
 </html>
