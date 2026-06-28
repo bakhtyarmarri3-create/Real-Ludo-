@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Text } from 'react-native';
 import LudoBoard from './LudoBoard';
 import DiceRoller from './DiceRoller';
 import LudoTokens from './LudoTokens';
-import LudoDashboard from './LudoDashboard'; // ڈیش بورڈ کو شامل کیا
+import LudoDashboard from './LudoDashboard';
+import LudoHome from './LudoHome'; // نئی اسکرین کو یہاں جوڑا
 import { getNextPosition } from './LudoEngine';
 
 export default function App() {
+  const [inGame, setInGame] = useState(false); // چیک کرے گا کہ بندہ ہوم اسکرین پر ہے یا گیم میں
+  const [roomCode, setRoomCode] = useState('');
+  const [myPlayerName, setMyPlayerName] = useState('');
+  const [myColor, setMyColor] = useState('RED');
+
   const [currentTurn, setCurrentTurn] = useState('RED');
   const [diceNumber, setDiceNumber] = useState(1);
   const [hasRolled, setHasRolled] = useState(false);
@@ -17,6 +23,13 @@ export default function App() {
     YELLOW: [-1, -1, -1, -1],
     BLUE:   [-1, -1, -1, -1],
   });
+
+  const handleStartGame = (id, name, color) => {
+    setRoomCode(id);
+    setMyPlayerName(name);
+    setMyColor(color);
+    setInGame(true); // لڈو بورڈ اسکرین کو لوڈ کرو
+  };
 
   const handleDiceRoll = (score) => {
     setDiceNumber(score);
@@ -52,10 +65,18 @@ export default function App() {
     moveToNextTurn();
   };
 
+  // اگر کھلاڑی ابھی ہوم اسکرین پر ہے
+  if (!inGame) {
+    return <LudoHome onStartGame={handleStartGame} />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* اوپر اور نیچے کا پریمیم انٹرفیس */}
       <LudoDashboard currentTurn={currentTurn} />
+
+      <View style={styles.roomCodeBadge}>
+        <Text style={styles.roomCodeText}>روم کوڈ: {roomCode}</Text>
+      </View>
 
       <View style={styles.boardWrapper}>
         <LudoBoard />
@@ -80,7 +101,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2A1A4E', // تصویر جیسا پریمیم گہرا جامنی/ڈارک بیک گراؤنڈ
+    backgroundColor: '#2A1A4E',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -88,6 +109,19 @@ const styles = StyleSheet.create({
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 40,
+    marginTop: 20,
+  },
+  roomCodeBadge: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 10,
+    marginBottom: 10,
+    zIndex: 20,
+  },
+  roomCodeText: {
+    color: '#FFCC00',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
