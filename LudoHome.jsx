@@ -8,30 +8,27 @@ export default function LudoHome({ onStartGame }) {
   const [playerName, setPlayerName] = useState('');
   const [inputRoomId, setInputRoomId] = useState('');
 
-  // روم بنانے کا بٹن
   const handleCreateRoom = () => {
     if (!playerName.trim()) {
       alert('براہ کرم پہلے اپنا نام لکھیں!');
       return;
     }
-    const newRoomId = generateRoomId(); // 6 ہندسوں کا کوڈ بنے گا
-    onStartGame(newRoomId, playerName, 'RED'); // روم بنانے والا ہمیشہ RED (پہلا پلیئر) ہوگا
+    const newRoomId = generateRoomId(); 
+    onStartGame(newRoomId, playerName, 'RED'); 
   };
 
-  // روم جوائن کرنے کا بٹن
   const handleJoinRoom = () => {
     if (!playerName.trim() || !inputRoomId.trim()) {
       alert('نام اور روم کوڈ دونوں لکھنا ضروری ہے!');
       return;
     }
-    onStartGame(inputRoomId, playerName, 'GREEN'); // جوائن کرنے والا اگلا پلیئر بنے گا
+    onStartGame(inputRoomId, playerName, 'GREEN'); 
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.logoText}>🎲 APNA LUDO 🎲</Text>
       
-      {/* نام لکھنے کا خانہ */}
       <View style={styles.card}>
         <Text style={styles.label}>اپنا نام لکھیں:</Text>
         <TextInput
@@ -43,14 +40,12 @@ export default function LudoHome({ onStartGame }) {
         />
       </View>
 
-      {/* روم بنانے کا سیکشن */}
       <TouchableOpacity style={styles.createBtn} onPress={handleCreateRoom}>
         <Text style={styles.btnText}>نیا روم بنائیں (Create Room)</Text>
       </TouchableOpacity>
 
       <Text style={styles.orText}>یا</Text>
 
-      {/* روم جوائن کرنے کا سیکشن */}
       <View style={styles.card}>
         <Text style={styles.label}>دوست کا روم کوڈ ڈالیں:</Text>
         <TextInput
@@ -83,9 +78,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFCC00',
     marginBottom: 40,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
   },
   card: {
     width: width * 0.85,
