@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ludo Star - Premium Wallet & Auth</title>
+<title>Ludo Star - Premium Portal</title>
 <style>
   * { box-sizing: border-box; margin:0; padding:0; }
   body {
@@ -12,341 +12,395 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
     color: #fff;
   }
-  .container {
+  .app {
     width: 420px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-    text-align: center;
-    backdrop-filter: blur(10px);
+    min-height: 100vh;
+    position: relative;
+    padding: 20px 16px;
   }
-  h1 { font-size: 28px; margin-bottom: 20px; color: #f3c623; text-shadow: 0 2px 4px rgba(0,0,0,0.5); letter-spacing: 1px; }
-  h3 { margin-bottom: 15px; font-weight: 600; opacity: 0.9; }
+  
+  /* Shared Auth Styles */
+  .auth-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    padding: 30px 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    text-align: center;
+    backdrop-filter: blur(15px);
+    margin-top: 40px;
+  }
+  .logo-area h1 { font-size: 32px; color: #f3c623; text-shadow: 0 3px 6px rgba(0,0,0,0.6); margin-bottom: 5px; }
+  .logo-area p { font-size: 13px; opacity: 0.7; margin-bottom: 25px; }
+  
   .screen { display: none; }
   .screen.active { display: block; }
   
+  .input-group { text-align: left; margin-bottom: 15px; }
+  .input-group label { font-size: 13px; opacity: 0.8; margin-left: 4px; display: inline-block; margin-bottom: 5px; }
+  
   input, select {
-    width: 100%; padding: 12px 16px; margin: 10px 0;
-    border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(0,0,0,0.3); color: #fff; font-size: 15px;
-    outline: none;
+    width: 100%; padding: 14px 16px;
+    border-radius: 14px; border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.4); color: #fff; font-size: 15px;
+    outline: none; transition: all 0.2s;
   }
-  input:focus, select:focus { border-color: #f3c623; }
+  input:focus, select:focus { border-color: #f3c623; box-shadow: 0 0 10px rgba(243,198,35,0.2); }
   
-  button {
-    width: 100%; padding: 14px; margin-top: 12px;
-    border-radius: 12px; border: none;
-    background: #f3c623; color: #1c0a30;
+  .btn-primary {
+    width: 100%; padding: 15px; margin-top: 10px;
+    border-radius: 14px; border: none;
+    background: linear-gradient(180deg, #fdd845, #f3c623); color: #1c0a30;
     font-size: 16px; font-weight: 700; cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 5px 15px rgba(243,198,35,0.3);
+    transition: transform 0.1s;
   }
-  button:active { transform: scale(0.98); }
-  button:hover { background: #ffe066; }
+  .btn-primary:active { transform: scale(0.97); }
   
-  .google-btn {
-    background: #fff; color: #444; display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-  .google-btn:hover { background: #eee; }
+  .switch-text { margin-top: 20px; font-size: 14px; opacity: 0.8; cursor: pointer; color: #5aa8ff; }
+  .switch-text:hover { text-decoration: underline; }
 
-  .link-text { margin-top: 15px; font-size: 14px; opacity: 0.8; cursor: pointer; color: #5aa8ff; }
+  /* GAME DASHBOARD STYLES */
+  .dashboard {
+    animation: fadeIn 0.4s ease-out;
+  }
+  .dash-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+  }
+  .profile-section { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #f3c623; background: #5c358d; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .p-name { font-weight: 700; font-size: 16px; }
+  .p-email { font-size: 12px; opacity: 0.6; }
   
-  /* Dashboard & Wallet Styles */
-  .dashboard-header {
-    display: flex; justify-content: space-between; align-items: center;
-    background: rgba(0,0,0,0.4); padding: 14px; border-radius: 16px; margin-bottom: 20px;
+  /* Elegant Interactive Wallet Button Card */
+  .wallet-widget {
+    background: linear-gradient(135deg, #4f2680, #341459);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px; padding: 18px; margin-bottom: 25px;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: transform 0.2s;
   }
-  .user-info { text-align: left; }
-  .user-email { font-size: 11px; opacity: 0.6; }
-  .coins-display { display: flex; align-items: center; gap: 6px; font-weight: bold; color: #f3c623; font-size: 18px; }
+  .wallet-widget:hover { transform: translateY(-2px); border-color: #f3c623; }
   
-  .wallet-card {
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px; padding: 16px; margin-bottom: 20px;
+  /* Wallet Drawer / Drawer Popup Area */
+  .wallet-drawer {
+    background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 16px; margin-bottom: 25px; display: none;
+    animation: slideDown 0.3s ease-out;
   }
-  .wallet-btns { display: flex; gap: 10px; margin-top: 10px; }
-  .wallet-btns button { margin-top: 0; padding: 10px; font-size: 14px; }
-  .btn-deposit { background: #1f9d4e; color: #fff; }
-  .btn-deposit:hover { background: #26b65b; }
-  .btn-withdraw { background: #d32f2f; color: #fff; }
-  .btn-withdraw:hover { background: #e53935; }
+  .wallet-drawer.open { display: block; }
+  .drawer-actions { display: flex; gap: 10px; margin-bottom: 15px; }
+  .drawer-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; }
+  .btn-dep { background: #1f9d4e; }
+  .btn-wd { background: #d32f2f; }
+  
+  /* Package Plan Grid inside Wallet Drawer */
+  .pkg-title { font-size: 14px; font-weight: 700; color: #f3c623; margin-bottom: 8px; text-align: left; }
+  .pkg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pkg-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 10px; text-align: left; font-size: 12px; }
+  .pkg-card strong { color: #5aa8ff; display: block; margin-bottom: 2px; }
 
-  .mode-card {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px; padding: 16px; margin: 12px 0; cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center;
-    transition: background 0.2s, border-color 0.2s;
+  /* Mode selection cards */
+  .lobby-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; text-align: left; }
+  .game-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px; padding: 18px; margin-bottom: 12px; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
   }
-  .mode-card:hover { background: rgba(255,255,255,0.1); border-color: #f3c623; }
-  .mode-details { text-align: left; }
-  .mode-title { font-weight: 700; font-size: 16px; }
-  .mode-desc { font-size: 12px; opacity: 0.7; margin-top: 2px; }
-  .mode-icon { font-size: 28px; }
+  .game-card:hover { background: rgba(255,255,255,0.1); border-color: #f3c623; }
+  .gc-left { text-align: left; }
+  .gc-title { font-weight: 700; font-size: 16px; }
+  .gc-desc { font-size: 12px; opacity: 0.6; margin-top: 3px; }
+  .gc-icon { font-size: 32px; }
 
+  /* Toast Notification */
   .toast {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    background: #f3c623; color: #000; padding: 12px 24px;
-    border-radius: 10px; font-size: 14px; font-weight: bold;
-    opacity: 0; transition: opacity 0.3s; z-index: 100;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    background: #f3c623; color: #1c0a30; padding: 12px 24px;
+    border-radius: 12px; font-size: 14px; font-weight: bold;
+    opacity: 0; transition: opacity 0.3s, top 0.3s; z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   }
-  .toast.show { opacity: 1; }
-  
-  .back-btn { background: none; color: #fff; border: 1px solid rgba(255,255,255,0.3); margin-top: 15px; }
-  .back-btn:hover { background: rgba(255,255,255,0.1); }
+  .toast.show { opacity: 1; top: 30px; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideDown { from { opacity: 0; max-height: 0; overflow: hidden; } to { opacity: 1; max-height: 500px; } }
 </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast">Logged in successfully!</div>
 
-<div class="container">
-  <h1>🏆 LUDO STAR</h1>
+<div class="app">
 
-  <div class="screen active" id="authScreen">
-    <h3>Login or Sign Up</h3>
-    <p style="font-size: 13px; opacity: 0.7; margin-bottom: 15px;">Get 5,000 Free Coins on New Account</p>
-    
-    <button class="google-btn" onclick="simulateGoogleLogin()">
-      <img src="https://cdnjs.cloudflare.com/ajax/libs/gapi-signer/0.0.1/google.svg" width="18" alt="G">
-      Sign in with Gmail
-    </button>
-    
-    <div style="margin: 20px 0; opacity: 0.3;">OR USE EMAIL</div>
-    
-    <input type="email" id="authEmail" placeholder="Enter your Gmail address">
-    <input type="password" id="authPass" placeholder="Enter Password">
-    <button onclick="handleEmailAuth()">Continue with Email</button>
+  <!-- ================= SCREEN 1: LOGIN ================= -->
+  <div class="screen active" id="loginScreen">
+    <div class="auth-card">
+      <div class="logo-area">
+        <h1>🏆 LUDO STAR</h1>
+        <p>Login to your account to play</p>
+      </div>
+      
+      <div class="input-group">
+        <label>Gmail Address</label>
+        <input type="email" id="loginEmail" placeholder="example@gmail.com">
+      </div>
+      
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••">
+      </div>
+      
+      <button class="btn-primary" onclick="handleLogin()">Login</button>
+      
+      <div class="switch-text" onclick="switchScreen('registerScreen')">
+        Don't have an account? Register Now
+      </div>
+    </div>
   </div>
 
+  <!-- ================= SCREEN 2: REGISTER ================= -->
+  <div class="screen" id="registerScreen">
+    <div class="auth-card">
+      <div class="logo-area">
+        <h1>🏆 LUDO STAR</h1>
+        <p>Create New Account & Get 5,000 Free Coins 🪙</p>
+      </div>
+      
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="regName" placeholder="Enter your name">
+      </div>
+      
+      <div class="input-group">
+        <label>Gmail Address</label>
+        <input type="email" id="regEmail" placeholder="yourname@gmail.com">
+      </div>
+      
+      <div class="input-group">
+        <label>Create Password</label>
+        <input type="password" id="regPass" placeholder="Minimum 4 characters">
+      </div>
+      
+      <button class="btn-primary" onclick="handleRegister()">Create Account</button>
+      
+      <div class="switch-text" onclick="switchScreen('loginScreen')">
+        Already have an account? Login
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN 3: PLATFORM/GAME DASHBOARD ================= -->
   <div class="screen" id="dashboardScreen">
-    <div class="dashboard-header">
-      <div class="user-info">
-        <div id="playerName" style="font-weight: 700;">Player</div>
-        <div id="playerEmail" class="user-email">player@gmail.com</div>
+    <div class="dashboard">
+      
+      <!-- Top Profile Area -->
+      <div class="dash-header">
+        <div class="profile-section">
+          <div class="avatar" id="userAvatar">🕹️</div>
+          <div style="text-align: left;">
+            <div class="p-name" id="dashName">Gamer</div>
+            <div class="p-email" id="dashEmail">gamer@gmail.com</div>
+          </div>
+        </div>
+        <button onclick="logout()" style="background:none; border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:8px; color:#ff5b5b; font-size:12px; cursor:pointer;">Logout</button>
       </div>
-      <div class="coins-display">🪙 <span id="playerCoins">0</span></div>
+
+      <!-- Wallet Interactive Widget (Click to Expand) -->
+      <div class="wallet-widget" onclick="toggleWalletDrawer()">
+        <div style="text-align: left;">
+          <div style="font-size: 12px; opacity: 0.7;">Main Wallet Balance</div>
+          <div style="font-size: 22px; font-weight: 800; color: #f3c623; margin-top: 2px;">
+            🪙 <span id="dashCoins">0</span>
+          </div>
+        </div>
+        <div style="font-size: 13px; color: #f3c623; background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 10px;">
+          Manage Wallet ⚙️
+        </div>
+      </div>
+
+      <!-- Expandable Wallet Drawer (Deposit, Withdraw, Mining Packages) -->
+      <div class="wallet-drawer" id="walletDrawer">
+        <div class="drawer-actions">
+          <button class="btn-dep" onclick="triggerAction('Deposit Setup Clicked')">➕ Deposit</button>
+          <button class="btn-wd" onclick="triggerAction('Withdraw Setup Clicked')">➖ Withdraw</button>
+        </div>
+        
+        <!-- Premium Mining / Staking Packages Section -->
+        <div class="pkg-title">Available Token & Mining Packages</div>
+        <div class="pkg-grid">
+          <div class="pkg-card" onclick="triggerAction('Silver Package Selected')">
+            <strong>🥈 Silver Plan</strong>
+            Cost: 10,000 Coins<br>Daily Return: 2%
+          </div>
+          <div class="pkg-card" onclick="triggerAction('Gold Package Selected')">
+            <strong>🥇 Gold Plan</strong>
+            Cost: 50,000 Coins<br>Daily Return: 3.5%
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Room / Matching Setup -->
+      <div class="lobby-title">Select Table Bet</div>
+      <select id="tableBet" style="margin-bottom: 20px;">
+        <option value="500">Bet Room: 500 Coins 🪙</option>
+        <option value="2000">Bet Room: 2,000 Coins 🪙</option>
+        <option value="5000">Bet Room: 5,000 Coins 🪙</option>
+        <option value="10000">Bet Room: 10,000 Coins 🪙</option>
+      </select>
+
+      <div class="lobby-title">Game Modes</div>
+      
+      <div class="game-card" onclick="playGameTable('computer')">
+        <div class="gc-left">
+          <div class="gc-title">Vs Computer (AI Bot)</div>
+          <div class="gc-desc">Test your skills offline against AI</div>
+        </div>
+        <div class="gc-icon">🤖</div>
+      </div>
+
+      <div class="game-card" onclick="playGameTable('friends')">
+        <div class="gc-left">
+          <div class="gc-title">Local Pass & Play</div>
+          <div class="gc-desc">Play locally with friends on this device</div>
+        </div>
+        <div class="gc-icon">👥</div>
+      </div>
+
     </div>
-
-    <div class="wallet-card">
-      <div style="font-size: 14px; opacity: 0.8; text-align: left;">Main Wallet Balance</div>
-      <div style="font-size: 24px; font-weight: 800; color: #f3c623; text-align: left; margin: 5px 0;">
-        🪙 <span id="walletCoins">0</span>
-      </div>
-      <div class="wallet-btns">
-        <button class="btn-deposit" onclick="switchScreen('depositScreen')">➕ Deposit</button>
-        <button class="btn-withdraw" onclick="switchScreen('withdrawScreen')">➖ Withdraw</button>
-      </div>
-    </div>
-
-    <h3 style="text-align: left; font-size: 16px;">Select Game Bet & Mode</h3>
-    <select id="gameBet">
-      <option value="500">Bet: 500 Coins 🪙</option>
-      <option value="2000">Bet: 2,000 Coins 🪙</option>
-      <option value="5000">Bet: 5,000 Coins 🪙</option>
-      <option value="10000">Bet: 10,000 Coins 🪙</option>
-    </select>
-
-    <div class="mode-card" onclick="launchGame('computer')">
-      <div class="mode-details">
-        <div class="mode-title">Vs Computer (Bot)</div>
-        <div class="mode-desc">Practice offline with intelligent bots</div>
-      </div>
-      <div class="mode-icon">🤖</div>
-    </div>
-
-    <div class="mode-card" onclick="launchGame('friends')">
-      <div class="mode-details">
-        <div class="mode-title">Pass & Play</div>
-        <div class="mode-desc">Play with friends on the same screen</div>
-      </div>
-      <div class="mode-icon">👥</div>
-    </div>
-    
-    <div class="link-text" style="color: #ff5b5b;" onclick="logout()">Logout Account</div>
-  </div>
-
-  <div class="screen" id="depositScreen">
-    <h3>Deposit Coins</h3>
-    <p style="font-size: 13px; opacity: 0.7; margin-bottom: 15px;">Select amount to load into your wallet</p>
-    
-    <select id="depositAmount">
-      <option value="5000">5,000 Coins = RS 500</option>
-      <option value="15000">15,000 Coins = RS 1,200</option>
-      <option value="50000">50,000 Coins = RS 3,500</option>
-    </select>
-    
-    <select id="depositMethod">
-      <option value="EasyPaisa">EasyPaisa</option>
-      <option value="JazzCash">JazzCash</option>
-      <option value="Bank">Bank Transfer</option>
-    </select>
-    
-    <button onclick="processDeposit()">Submit Deposit Request</button>
-    <button class="back-btn" onclick="switchScreen('dashboardScreen')">Back to Dashboard</button>
-  </div>
-
-  <div class="screen" id="withdrawScreen">
-    <h3>Withdraw Cash</h3>
-    <p style="font-size: 13px; opacity: 0.7; margin-bottom: 15px;">Convert your winning coins into real money</p>
-    
-    <input type="number" id="withdrawAmount" placeholder="Enter Coins to Withdraw (Min: 2000)">
-    <select id="withdrawMethod">
-      <option value="EasyPaisa">EasyPaisa</option>
-      <option value="JazzCash">JazzCash</option>
-    </select>
-    <input type="text" id="withdrawAccount" placeholder="Account Number (e.g. 0300xxxxxxx)">
-    
-    <button onclick="processWithdraw()">Request Cashout</button>
-    <button class="back-btn" onclick="switchScreen('dashboardScreen')">Back to Dashboard</button>
   </div>
 
 </div>
 
 <script>
-  let users = JSON.parse(localStorage.getItem('ludo_premium_users')) || {};
-  let currentUser = localStorage.getItem('ludo_premium_current') || null;
+  // Local Database Object
+  let database = JSON.parse(localStorage.getItem('ludo_db')) || {};
+  let sessionUser = localStorage.getItem('ludo_session') || null;
 
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
+    t.textContent = msg;
+    t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
   }
 
-  function switchScreen(screenId) {
+  function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    document.getElementById(id).classList.add('active');
   }
 
-  // Google Login Simulation
-  function simulateGoogleLogin() {
-    const fakeEmails = ["ludoking99@gmail.com", "player.star@gmail.com", "gamer786@gmail.com", "pro_ludo@gmail.com"];
-    const randomEmail = fakeEmails[Math.floor(Math.random() * fakeEmails.length)];
-    
-    registerAndLogin(randomEmail);
-  }
+  // Registration Handler
+  function handleRegister() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim().toLowerCase();
+    const pass = document.getElementById('regPass').value.trim();
 
-  // Manual Email Auth
-  function handleEmailAuth() {
-    const email = document.getElementById('authEmail').value.trim();
-    const pass = document.getElementById('authPass').value.trim();
-    
-    if(!email.includes('@') || !email.includes('.com')) {
-      showToast('Please enter a valid Gmail address!');
+    if(!name || !email || !pass) {
+      showToast('Please fill all fields properly!');
+      return;
+    }
+    if(!email.includes('@') || !email.includes('.')) {
+      showToast('Invalid Gmail/Email address!');
       return;
     }
     if(pass.length < 4) {
       showToast('Password must be at least 4 characters');
       return;
     }
-    
-    registerAndLogin(email);
-  }
-
-  function registerAndLogin(email) {
-    const username = email.split('@');
-    
-    if(!users[email]) {
-      // New registration gives 5,000 welcome coins
-      users[email] = { username: username, coins: 5000 };
-      showToast('Welcome! 5,000 Coins added to wallet 🪙');
-    } else {
-      showToast('Logged in successfully!');
+    if(database[email]) {
+      showToast('Account already exists! Please Login.');
+      return;
     }
+
+    // Save user with 5,000 free signup coins
+    database[email] = { name: name, password: pass, coins: 5000 };
+    localStorage.setItem('ludo_db', JSON.stringify(database));
     
-    localStorage.setItem('ludo_premium_users', JSON.stringify(users));
-    currentUser = email;
-    localStorage.setItem('ludo_premium_current', email);
+    showToast('Account Created! 5,000 Free Coins Gifted 🪙');
     
-    loadDashboard();
+    // Switch to login right after registration so they can sign in cleanly
+    setTimeout(() => { switchScreen('loginScreen'); }, 1500);
   }
 
-  function loadDashboard() {
-    if(!currentUser || !users[currentUser]) return;
+  // Login Handler
+  function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const pass = document.getElementById('loginPass').value.trim();
+
+    if(!database[email] || database[email].password !== pass) {
+      showToast('Invalid Email or Password!');
+      return;
+    }
+
+    // Session verification step
+    sessionUser = email;
+    localStorage.setItem('ludo_session', email);
     
-    document.getElementById('playerName').textContent = users[currentUser].username.toUpperCase();
-    document.getElementById('playerEmail').textContent = currentUser;
-    document.getElementById('playerCoins').textContent = users[currentUser].coins.toLocaleString();
-    document.getElementById('walletCoins').textContent = users[currentUser].coins.toLocaleString();
-    
+    showToast('Logged in successfully! 🎉');
+    setTimeout(() => { loadDashboardData(); }, 1000);
+  }
+
+  // Dashboard Loader
+  function loadDashboardData() {
+    if(!sessionUser || !database[sessionUser]) return;
+
+    const user = database[sessionUser];
+    document.getElementById('dashName').textContent = user.name.toUpperCase();
+    document.getElementById('dashEmail').textContent = sessionUser;
+    document.getElementById('dashCoins').textContent = user.coins.toLocaleString();
+    document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+
     switchScreen('dashboardScreen');
   }
 
-  // Wallet Deposit Logic
-  function processDeposit() {
-    const amount = parseInt(document.getElementById('depositAmount').value);
-    const method = document.getElementById('depositMethod').value;
-    
-    users[currentUser].coins += amount;
-    localStorage.setItem('ludo_premium_users', JSON.stringify(users));
-    
-    showToast(`Deposit Successful! ${amount.toLocaleString()} Coins added via ${method}`);
-    loadDashboard();
+  // Wallet Drawer Toggle
+  function toggleWalletDrawer() {
+    const drawer = document.getElementById('walletDrawer');
+    drawer.classList.toggle('open');
   }
 
-  // Wallet Withdraw Logic
-  function processWithdraw() {
-    const amount = parseInt(document.getElementById('withdrawAmount').value);
-    const account = document.getElementById('withdrawAccount').value.trim();
-    const method = document.getElementById('withdrawMethod').value;
-    
-    if(isNaN(amount) || amount < 2000) {
-      showToast('Minimum withdrawal is 2,000 Coins');
-      return;
-    }
-    if(!account) {
-      showToast('Please enter your account details');
-      return;
-    }
-    if(users[currentUser].coins < amount) {
-      showToast('Insufficient wallet balance!');
-      return;
-    }
-    
-    users[currentUser].coins -= amount;
-    localStorage.setItem('ludo_premium_users', JSON.stringify(users));
-    
-    showToast(`Withdraw request submitted for ${amount.toLocaleString()} Coins via ${method}`);
-    loadDashboard();
+  // Action placeholder helper
+  function triggerAction(actionName) {
+    showToast(`${actionName}`);
   }
 
-  // Deduct Coins and Launch game.html
-  function launchGame(mode) {
-    const bet = parseInt(document.getElementById('gameBet').value);
-    
-    if(users[currentUser].coins < bet) {
-      showToast(`You need at least ${bet.toLocaleString()} Coins to join this table!`);
+  // Game Launcher with Automatic Coin Deduction
+  function playGameTable(mode) {
+    const betAmount = parseInt(document.getElementById('tableBet').value);
+    const user = database[sessionUser];
+
+    if(user.coins < betAmount) {
+      showToast(`Insufficient coins! You need ${betAmount} coins.`);
       return;
     }
-    
-    // Deduct coins from wallet for current bet
-    users[currentUser].coins -= bet;
-    localStorage.setItem('ludo_premium_users', JSON.stringify(users));
-    
-    showToast(`Table Joined! Bet ${bet.toLocaleString()} deducted.`);
+
+    // Deduct coins live
+    user.coins -= betAmount;
+    localStorage.setItem('ludo_db', JSON.stringify(database));
+    document.getElementById('dashCoins').textContent = user.coins.toLocaleString();
+
+    showToast(`Table joined! ${betAmount} Coins deducted.`);
     
     setTimeout(() => {
-      // Redirect to your untouched game board file
-      window.location.href = `game.html?mode=${mode}&bet=${bet}`;
+      // Safely redirects to your clean ludo board file
+      window.location.href = `game.html?mode=${mode}&bet=${betAmount}`;
     }, 1200);
   }
 
   function logout() {
-    localStorage.removeItem('ludo_premium_current');
-    currentUser = null;
-    switchScreen('authScreen');
+    localStorage.removeItem('ludo_session');
+    sessionUser = null;
+    switchScreen('loginScreen');
   }
 
-  // Auto-login if session exists
+  // Check ongoing session on load
   window.onload = function() {
-    if(currentUser && users[currentUser]) {
-      loadDashboard();
+    if(sessionUser && database[sessionUser]) {
+      loadDashboardData();
     }
-  }
+  };
 </script>
 </body>
 </html>
