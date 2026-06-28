@@ -1,244 +1,594 @@
 <!DOCTYPE html>
 <html lang="ur">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎲 APNA LUDO PREMIUM 🎲</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #2A1A4E;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            width: 100%;
-            max-width: 460px;
-            padding: 15px;
-            text-align: center;
-        }
-        
-        /* === ٹاپ بار (تصویر کی طرح) === */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 0 10px;
-        }
-        .spectator-badge {
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ludo Star Board</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(160deg, #3b1f5c, #2a1245 60%, #1c0a30);
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    color:#fff;
+  }
+  .app {
+    width: 420px;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 90px;
+  }
+  .topbar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 16px 6px;
+  }
+  .icon-btn {
+    width:42px; height:42px;
+    border-radius:12px;
+    background: rgba(255,255,255,0.08);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor:pointer;
+  }
+  .icon-btn:active { transform: scale(0.92); }
+  .spectator-pill {
+    flex:1;
+    margin: 0 10px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 20px;
+    padding: 9px 16px;
+    font-weight:600;
+    font-size:13px;
+    text-align:center;
+  }
+  .gift-bag { font-size: 26px; cursor:pointer; }
 
-        /* === اصلی پریمیم لڈو بورڈ (15x15 گریڈ) === */
-        .ludo-board {
-            width: 390px;
-            height: 390px;
-            background: #FFF;
-            margin: 10px auto;
-            border: 6px solid #5c3b8e;
-            border-radius: 12px;
-            display: grid;
-            grid-template-columns: repeat(15, 1fr);
-            grid-template-rows: repeat(15, 1fr);
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
+  .turn-banner {
+    text-align:center;
+    padding: 6px 16px;
+    font-size: 15px;
+    font-weight:700;
+  }
+  .turn-banner .dot {
+    display:inline-block;
+    width:11px;height:11px;
+    border-radius:50%;
+    margin-right:6px;
+    vertical-align:middle;
+  }
 
-        /* بڑے ہوم باکسز (6x6) */
-        .big-home { grid-column: span 6; grid-row: span 6; position: relative; border: 1px solid #CCC; display: flex; justify-content: center; align-items: center; }
-        .red-home { background: #ED1C24; }
-        .green-home { background: #00A859; }
-        .yellow-home { background: #FFCC00; }
-        .blue-home { background: #0054A6; }
-        
-        .inner-box { width: 70%; height: 70%; background: #FFF; border-radius: 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; padding: 5px; box-sizing: border-box; }
-        
-        /* چھوٹے خانے (Tracks) */
-        .cell { border: 1px solid #DDD; background: #FFF; box-sizing: border-box; position: relative; }
-        .red-cell { background: #ED1C24; }
-        .green-cell { background: #00A859; }
-        .yellow-cell { background: #FFCC00; }
-        .blue-cell { background: #0054A6; }
-        
-        /* اسٹار / سیف زون خانے */
-        .star-cell::after { content: "⭐"; font-size: 11px; position: absolute; top: 15%; left: 15%; color: #666; }
+  .board-wrap { padding: 4px 10px; }
 
-        /* سینٹر ہوم (3x3) */
-        .center-home {
-            grid-column: span 3;
-            grid-row: span 3;
-            background: #FFF;
-            position: relative;
-            background-image: conic-gradient(#ED1C24 0.25turn, #00A859 0.25turn 0.5turn, #FFCC00 0.5turn 0.75turn, #0054A6 0.75turn);
-        }
+  .board {
+    position:relative;
+    width:100%;
+    aspect-ratio: 1/1;
+    background: #fff;
+    border-radius: 16px;
+    border: 6px solid #4f2f18;
+    overflow:hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
 
-        /* اصلی گوٹیاں (Premium Tokens) */
-        .token {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 2px solid #FFF;
-            display: inline-block;
-            margin: auto;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
-            cursor: pointer;
-            z-index: 5;
-            position: absolute;
-        }
-        .token-red { background: radial-gradient(circle, #ff6b6b, #ED1C24); }
-        
-        /* باٹم کنٹرولز */
-        .controls {
-            margin-top: 20px;
-            background: rgba(255,255,255,0.08);
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .dice-box {
-            width: 60px;
-            height: 60px;
-            background: white;
-            color: #333;
-            font-size: 32px;
-            line-height: 60px;
-            border-radius: 12px;
-            margin: 10px auto;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-weight: bold;
-        }
-        .btn {
-            padding: 10px 20px;
-            background: #FFCC00;
-            color: #333;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
+  .home-quad {
+    position:absolute;
+    width:40%; height:40%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .home-quad.q-green  { top:0; left:0; background:#1f9d4e; }
+  .home-quad.q-yellow { top:0; right:0; background:#e8b400; }
+  .home-quad.q-red    { bottom:0; left:0; background:#d32f2f; }
+  .home-quad.q-blue   { bottom:0; right:0; background:#2266cc; }
+  .home-quad .inner-square {
+    width:78%; height:78%;
+    background: rgba(255,255,255,0.92);
+    border-radius: 12px;
+  }
+
+  .center-tri {
+    position:absolute;
+    width:20%; height:20%;
+    top:40%; left:40%;
+    z-index:3;
+  }
+  .center-tri svg { width:100%; height:100%; display:block; }
+
+  .path-cell {
+    position:absolute;
+    width: 6.5%; height: 6.5%;
+    background:#fff;
+    border: 1px solid #ccc;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 9px;
+    z-index:2;
+  }
+  .path-cell.start-green  { background:#1f9d4e; }
+  .path-cell.start-yellow { background:#e8b400; }
+  .path-cell.start-red    { background:#d32f2f; }
+  .path-cell.start-blue   { background:#2266cc; }
+  .path-cell.home-green   { background:#a7e3bd; }
+  .path-cell.home-yellow  { background:#f6dd8f; }
+  .path-cell.home-red     { background:#f0a8a8; }
+  .path-cell.home-blue    { background:#a9c6f0; }
+  .path-cell.safe-star::after { content:"⭐"; font-size:11px; }
+  .path-cell.start-square::after { content:"🚩"; font-size:10px; }
+
+  .piece {
+    position:absolute;
+    width: 6%; height:6%;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 8px;
+    font-weight:800;
+    color:#fff;
+    box-shadow: inset 0 -3px 5px rgba(0,0,0,0.35), 0 2px 5px rgba(0,0,0,0.5);
+    cursor:pointer;
+    z-index: 10;
+    transition: left .4s ease, top .4s ease, transform .15s;
+    transform: translate(-50%,-50%);
+  }
+  .piece:active { transform: translate(-50%,-50%) scale(0.85); }
+  .piece.green-piece { background: radial-gradient(circle at 35% 30%, #3fae5e, #0f5c28); }
+  .piece.yellow-piece { background: radial-gradient(circle at 35% 30%, #ffd84d, #b07d00); }
+  .piece.red-piece { background: radial-gradient(circle at 35% 30%, #ff6b5b, #a30000); }
+  .piece.blue-piece { background: radial-gradient(circle at 35% 30%, #5aa8ff, #0c3e8a); }
+  .piece.movable {
+    box-shadow: 0 0 0 3px #fff, 0 0 14px 5px #fff8c4;
+    animation: pulse 0.7s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform: translate(-50%,-50%) scale(1); }
+    50% { transform: translate(-50%,-50%) scale(1.25); }
+  }
+
+  .status-text {
+    text-align:center;
+    font-size: 13px;
+    opacity:0.9;
+    padding: 8px 16px 4px;
+    min-height: 18px;
+  }
+
+  .dice-row {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap: 16px;
+    padding: 4px 18px 4px;
+  }
+  .dice-box {
+    width:60px; height:60px;
+    background: linear-gradient(180deg,#fff,#ddd);
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:28px;
+    color:#222;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+    border: 3px solid #222;
+    user-select:none;
+  }
+  .dice-box.rolling { animation: spin 0.4s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .current-player {
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    padding: 10px 18px 6px;
+  }
+  .me-avatar-wrap { width:54px;height:54px; }
+  .me-avatar-wrap img {
+    width:54px;height:54px;
+    border-radius:50%;
+    object-fit:cover;
+    border: 3px solid #3d8b3d;
+  }
+  .player-name { font-weight:700; font-size:14px; }
+  .player-score { font-size:12px; opacity:0.85; }
+
+  .bottom-bar {
+    position:absolute;
+    bottom: 14px;
+    left:0; right:0;
+    display:flex;
+    justify-content:space-between;
+    padding: 0 18px;
+  }
+  .pill-btn {
+    flex:1;
+    margin: 0 6px;
+    height:44px;
+    border-radius:22px;
+    background: rgba(255,255,255,0.12);
+    display:flex; align-items:center; justify-content:center;
+    font-size:19px;
+    cursor:pointer;
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  .pill-btn:active { transform: scale(0.95); }
+
+  .toast {
+    position: fixed;
+    top: 16px; left:50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    opacity:0;
+    transition: opacity .3s;
+    z-index: 50;
+    white-space:nowrap;
+  }
+  .toast.show { opacity:1; }
+
+  .winner-overlay {
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.8);
+    display:none;
+    align-items:center; justify-content:center;
+    z-index: 100;
+    flex-direction:column;
+    gap: 16px;
+  }
+  .winner-overlay.show { display:flex; }
+  .winner-overlay h1 { font-size: 26px; }
+  .winner-overlay button {
+    padding: 12px 28px;
+    border-radius: 24px;
+    border:none;
+    background:#f3c623;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+  }
+</style>
 </head>
 <body>
+<div class="app">
 
-    <div class="container">
-        <div class="top-bar">
-            <div>⚙️</div>
-            <div class="spectator-badge">👁️ Spectator 0</div>
-            <div>🛍️</div>
-        </div>
+  <div class="toast" id="toast"></div>
 
-        <h3 style="color: #FFCC00; margin: 0;">🎲 اصلی پریمیم لڈو اسٹرکچر 🎲</h3>
+  <div class="winner-overlay" id="winnerOverlay">
+    <h1 id="winnerText">🎉 جیت گئے!</h1>
+    <button onclick="location.reload()">دوبارہ کھیلیں</button>
+  </div>
 
-        <div class="ludo-board">
-            
-            <div class="big-home green-home">
-                <div class="inner-box">
-                    <div style="background:#00A859; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#00A859; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#00A859; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#00A859; border-radius:50%; margin:4px;"></div>
-                </div>
-            </div>
+  <div class="topbar">
+    <div class="icon-btn" id="settingsBtn">⚙️</div>
+    <div class="icon-btn" id="trophyBtn">🏆</div>
+    <div class="spectator-pill">👁️ Spectator 0</div>
+    <div class="gift-bag" id="bagBtn">🎁</div>
+  </div>
 
-            <div class="cell"></div><div class="cell green-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell green-cell"></div><div class="cell green-cell star-cell"></div>
-            <div class="cell star-cell"></div><div class="cell green-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell green-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell green-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell green-cell"></div><div class="cell"></div>
+  <div class="turn-banner" id="turnBanner">
+    <span class="dot" id="turnDot" style="background:#1f9d4e;"></span>
+    <span id="turnLabel">سبز کی باری</span>
+  </div>
 
-            <div class="big-home yellow-home">
-                <div class="inner-box">
-                    <div style="background:#FFCC00; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#FFCC00; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#FFCC00; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#FFCC00; border-radius:50%; margin:4px;"></div>
-                </div>
-            </div>
+  <div class="board-wrap">
+    <div class="board" id="board">
+      <div class="home-quad q-green"><div class="inner-square"></div></div>
+      <div class="home-quad q-yellow"><div class="inner-square"></div></div>
+      <div class="home-quad q-red"><div class="inner-square"></div></div>
+      <div class="home-quad q-blue"><div class="inner-square"></div></div>
 
-            <div class="cell"></div><div class="cell star-cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-            <div class="center-home"></div>
-            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell star-cell"></div><div class="cell"></div>
+      <div class="center-tri">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <polygon points="0,0 50,50 0,100" fill="#1f9d4e"/>
+          <polygon points="0,0 50,50 100,0" fill="#e8b400"/>
+          <polygon points="100,0 50,50 100,100" fill="#2266cc"/>
+          <polygon points="0,100 50,50 100,100" fill="#d32f2f"/>
+        </svg>
+      </div>
 
-            <div class="cell"></div><div class="cell red-cell"></div><div class="cell red-cell"></div><div class="cell red-cell"></div><div class="cell red-cell"></div><div class="cell red-cell"></div>
-            <div class="cell yellow-cell"></div><div class="cell yellow-cell"></div><div class="cell yellow-cell"></div><div class="cell yellow-cell"></div><div class="cell yellow-cell"></div><div class="cell"></div>
-
-            <div class="cell"></div><div class="cell"></div><div class="cell red-cell star-cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-
-            <div class="big-home red-home">
-                <div class="inner-box">
-                    <div class="token token-red" style="position:relative; margin:5px;" id="rToken" onclick="moveRedToken()"></div>
-                    <div style="background:#ED1C24; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#ED1C24; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#ED1C24; border-radius:50%; margin:4px;"></div>
-                </div>
-            </div>
-
-            <div class="cell"></div><div class="cell blue-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell blue-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell blue-cell"></div><div class="cell"></div>
-            <div class="cell star-cell"></div><div class="cell blue-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell blue-cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell blue-cell"></div><div class="cell"></div>
-
-            <div class="big-home blue-home">
-                <div class="inner-box">
-                    <div style="background:#0054A6; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#0054A6; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#0054A6; border-radius:50%; margin:4px;"></div>
-                    <div style="background:#0054A6; border-radius:50%; margin:4px;"></div>
-                </div>
-            </div>
-
-            <div id="start-point" style="position: absolute; width: 24px; height: 24px; top: 240px; left: 38px; z-index: 10;"></div>
-
-        </div>
-
-        <div class="controls">
-            <div style="font-size:15px; margin-bottom:5px;">باری: <span style="color:#ED1C24; font-weight:bold;">RED</span></div>
-            <div class="dice-box" id="web-dice" onclick="rollWebDice()">🎲</div>
-            <div style="font-size:12px; color:#DDD;">ڈائس پر کلک کریں۔ جب <b>6</b> آئے گا، تو لال گوٹی پر کلک کریں، وہ پریمیم ٹریک پر باہر نکل آئے گی!</div>
-        </div>
+      <!-- path cells + pieces injected here by JS -->
     </div>
+  </div>
 
-    <script>
-        let diceValue = 1;
-        function rollWebDice() {
-            diceValue = Math.floor(Math.random() * 6) + 1;
-            const diceEmojis = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-            document.getElementById('web-dice').innerText = diceEmojis[diceValue];
-            
-            if(diceValue === 6) {
-                alert("چھکا (6) آ گیا! اب سرخ گوٹی پر کلک کر کے اسے باہر نکالیں۔");
-            }
+  <div class="status-text" id="statusText">ڈائس دبائیں اور کھیل شروع کریں</div>
+
+  <div class="dice-row">
+    <div class="dice-box" id="diceBox">🎲</div>
+  </div>
+
+  <div class="current-player">
+    <div class="me-avatar-wrap">
+      <img src="https://images.unsplash.com/photo-1547721064-da6cfb341d50?w=200&h=200&fit=crop" alt="me">
+    </div>
+    <div>
+      <div class="player-name">Player_546197</div>
+      <div class="player-score" id="scoreLine">G:0 Y:0 R:0 B:0 گھر پہنچیں</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="pill-btn" id="micToggle">🎙️</div>
+    <div class="pill-btn" id="emojiBtn">🙂</div>
+    <div class="pill-btn" id="chatBtn">💬</div>
+  </div>
+</div>
+
+<script>
+const CELL = 100/15;
+
+function cellPct(row, col) {
+  return { left: (col + 0.5) * CELL, top: (row + 0.5) * CELL };
+}
+
+const mainPath = [
+  [6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],
+  [1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],
+  [8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],
+  [14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],
+  [8,1],[8,0],[7,0],[6,0]
+];
+
+const homeColumns = {
+  green:  [[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],
+  yellow: [[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],
+  blue:   [[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],
+  red:    [[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]
+};
+
+const CENTER_CELL = [7,7];
+const COLORS = ['green','yellow','red','blue'];
+const COLOR_HEX = { green:'#1f9d4e', yellow:'#e8b400', red:'#d32f2f', blue:'#2266cc' };
+const COLOR_NAME_UR = { green:'سبز', yellow:'پیلا', red:'سرخ', blue:'نیلا' };
+const START_OFFSET = { green:0, yellow:13, blue:26, red:39 };
+const SAFE_ABS = [0,8,13,21,26,34,39,47];
+const START_ABS = [0,13,26,39];
+
+const homeSlots = {
+  green:  [[13,13],[13,27],[27,13],[27,27]],
+  yellow: [[13,73],[13,87],[27,73],[27,87]],
+  red:    [[73,13],[73,27],[87,13],[87,27]],
+  blue:   [[73,73],[73,87],[87,73],[87,87]]
+};
+
+const board = document.getElementById('board');
+
+function colorOfStartIdx(i) {
+  for (const c of COLORS) if (START_OFFSET[c] === i) return c;
+  return null;
+}
+
+mainPath.forEach((rc, i) => {
+  const div = document.createElement('div');
+  div.className = 'path-cell';
+  const pos = cellPct(rc[0], rc[1]);
+  div.style.left = pos.left + '%';
+  div.style.top = pos.top + '%';
+  div.style.transform = 'translate(-50%,-50%)';
+  if (START_ABS.includes(i)) {
+    const c = colorOfStartIdx(i);
+    div.classList.add('start-' + c, 'start-square');
+  } else if (SAFE_ABS.includes(i)) {
+    div.classList.add('safe-star');
+  }
+  board.appendChild(div);
+});
+
+COLORS.forEach(color => {
+  homeColumns[color].forEach(rc => {
+    const div = document.createElement('div');
+    div.className = 'path-cell home-' + color;
+    const pos = cellPct(rc[0], rc[1]);
+    div.style.left = pos.left + '%';
+    div.style.top = pos.top + '%';
+    div.style.transform = 'translate(-50%,-50%)';
+    board.appendChild(div);
+  });
+});
+
+let state = {
+  turnIndex: 0,
+  positions: { green:[-1,-1,-1,-1], yellow:[-1,-1,-1,-1], red:[-1,-1,-1,-1], blue:[-1,-1,-1,-1] },
+  finished: { green:0, yellow:0, red:0, blue:0 },
+  diceValue: 0,
+  rolled: false,
+  consecSixes: 0
+};
+
+const toast = document.getElementById('toast');
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=> toast.classList.remove('show'), 1400);
+}
+
+function currentColor() { return COLORS[state.turnIndex]; }
+
+function updateTurnBanner() {
+  const c = currentColor();
+  document.getElementById('turnDot').style.background = COLOR_HEX[c];
+  document.getElementById('turnLabel').textContent = COLOR_NAME_UR[c] + ' کی باری';
+}
+function updateScoreLine() {
+  document.getElementById('scoreLine').textContent =
+    `G:${state.finished.green} Y:${state.finished.yellow} R:${state.finished.red} B:${state.finished.blue} گھر پہنچیں`;
+}
+
+function movablePieces(color, dice) {
+  const arr = state.positions[color];
+  const movable = [];
+  arr.forEach((pos, idx) => {
+    if (pos === -1) {
+      if (dice === 6) movable.push(idx);
+    } else if (pos >= 0 && pos <= 56) {
+      if (pos + dice <= 57) movable.push(idx);
+    }
+  });
+  return movable;
+}
+
+function highlightMovable() {
+  document.querySelectorAll('.piece').forEach(p => p.classList.remove('movable'));
+  if (!state.rolled) return;
+  const color = currentColor();
+  const movable = movablePieces(color, state.diceValue);
+  movable.forEach(idx => {
+    const el = document.querySelector(`.piece[data-color="${color}"][data-id="${idx}"]`);
+    if (el) el.classList.add('movable');
+  });
+  if (movable.length === 0) {
+    document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]}: کوئی چال ممکن نہیں — اگلی باری`;
+    setTimeout(nextTurn, 1100);
+  } else {
+    document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]}: چمکتی گوٹی پر ٹیپ کریں`;
+  }
+}
+
+function rollDice() {
+  if (state.rolled) { showToast('پہلے گوٹی چلائیں'); return; }
+  const diceBox = document.getElementById('diceBox');
+  diceBox.classList.add('rolling');
+  let n = 0;
+  const spin = setInterval(()=> { n = Math.ceil(Math.random()*6); diceBox.textContent = n; }, 70);
+  setTimeout(()=> {
+    clearInterval(spin);
+    diceBox.classList.remove('rolling');
+    n = Math.ceil(Math.random()*6);
+    diceBox.textContent = n;
+    state.diceValue = n;
+    state.rolled = true;
+    document.getElementById('statusText').textContent =
+      `${COLOR_NAME_UR[currentColor()]} نے ${n} نمبر پایا`;
+    highlightMovable();
+  }, 650);
+}
+
+function pieceCoord(color, pos) {
+  if (pos === -1) return null;
+  if (pos === 57) return cellPct(CENTER_CELL[0], CENTER_CELL[1]);
+  if (pos >= 51) {
+    const rc = homeColumns[color][pos - 51];
+    return cellPct(rc[0], rc[1]);
+  }
+  const abs = (START_OFFSET[color] + pos) % 52;
+  const rc = mainPath[abs];
+  return cellPct(rc[0], rc[1]);
+}
+
+function renderPieces() {
+  COLORS.forEach(color => {
+    state.positions[color].forEach((pos, idx) => {
+      let el = document.querySelector(`.piece[data-color="${color}"][data-id="${idx}"]`);
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'piece ' + color + '-piece';
+        el.dataset.color = color;
+        el.dataset.id = idx;
+        el.textContent = color[0].toUpperCase() + (idx+1);
+        el.addEventListener('click', () => movePiece(color, idx));
+        board.appendChild(el);
+      }
+      let coord;
+      if (pos === -1) {
+        const slot = homeSlots[color][idx];
+        coord = { left: slot[1], top: slot[0] };
+      } else {
+        coord = pieceCoord(color, pos);
+      }
+      el.style.left = coord.left + '%';
+      el.style.top = coord.top + '%';
+    });
+  });
+}
+
+const SAFE_RELATIVE_BY_ABS = SAFE_ABS;
+function checkCapture(movedColor, pos) {
+  if (pos > 50) return;
+  const myAbs = (START_OFFSET[movedColor] + pos) % 52;
+  const isSafe = SAFE_RELATIVE_BY_ABS.includes(myAbs);
+  if (isSafe) return;
+  COLORS.forEach(otherColor => {
+    if (otherColor === movedColor) return;
+    state.positions[otherColor].forEach((otherPos, otherIdx) => {
+      if (otherPos >= 0 && otherPos <= 50) {
+        const otherAbs = (START_OFFSET[otherColor] + otherPos) % 52;
+        if (otherAbs === myAbs) {
+          state.positions[otherColor][otherIdx] = -1;
+          showToast(`${COLOR_NAME_UR[otherColor]} کی گوٹی کٹ گئی! 💥`);
         }
+      }
+    });
+  });
+}
 
-        function moveRedToken() {
-            if(diceValue === 6) {
-                const token = document.getElementById('rToken');
-                const startPoint = document.getElementById('start-point');
-                
-                // گوٹی کو گرافیکلی اٹھا کر باہر ٹریک پر لانا
-                startPoint.appendChild(token);
-                token.style.position = "static";
-                alert("زبردست! سرخ گوٹی پریمیم اسٹرکچر کے سٹارٹ پوائنٹ پر آ گئی ہے! 🔥");
-            } else {
-                alert("گوٹی باہر نکالنے کے لیے ڈائس پر کلک کر کے پہلے 6 لائیں۔");
-            }
-        }
-    </script>
+function checkWin(color) {
+  if (state.finished[color] === 4) {
+    document.getElementById('winnerText').textContent = `🎉 ${COLOR_NAME_UR[color]} جیت گیا!`;
+    document.getElementById('winnerOverlay').classList.add('show');
+  }
+}
 
+function movePiece(color, idx) {
+  if (!state.rolled) { showToast('پہلے ڈائس دبائیں'); return; }
+  if (color !== currentColor()) { showToast('یہ آپ کی باری نہیں'); return; }
+  const movable = movablePieces(color, state.diceValue);
+  if (!movable.includes(idx)) { showToast('یہ گوٹی ابھی نہیں چل سکتی'); return; }
+
+  let pos = state.positions[color][idx];
+  pos = (pos === -1) ? 0 : pos + state.diceValue;
+  state.positions[color][idx] = pos;
+
+  if (pos === 57) {
+    state.finished[color]++;
+    showToast(`${COLOR_NAME_UR[color]} کی گوٹی گھر پہنچ گئی! 🏠`);
+  } else {
+    checkCapture(color, pos);
+  }
+
+  renderPieces();
+  updateScoreLine();
+  document.querySelectorAll('.piece').forEach(p => p.classList.remove('movable'));
+  checkWin(color);
+
+  const wasSix = state.diceValue === 6;
+  state.rolled = false;
+
+  if (wasSix) {
+    state.consecSixes++;
+    if (state.consecSixes >= 3) {
+      state.consecSixes = 0;
+      nextTurn();
+    } else {
+      document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]} کو دوبارہ چکا ملا (6) — ڈائس دبائیں`;
+    }
+  } else {
+    state.consecSixes = 0;
+    nextTurn();
+  }
+}
+
+function nextTurn() {
+  state.turnIndex = (state.turnIndex + 1) % COLORS.length;
+  state.diceValue = 0;
+  state.rolled = false;
+  updateTurnBanner();
+  document.getElementById('statusText').textContent = `${COLOR_NAME_UR[currentColor()]} کی باری — ڈائس دبائیں`;
+}
+
+document.getElementById('diceBox').addEventListener('click', rollDice);
+document.getElementById('settingsBtn').addEventListener('click', ()=> showToast('Settings'));
+document.getElementById('trophyBtn').addEventListener('click', ()=> showToast('Leaderboard'));
+document.getElementById('bagBtn').addEventListener('click', ()=> showToast('Store'));
+document.getElementById('micToggle').addEventListener('click', ()=> showToast('Mic toggled'));
+document.getElementById('emojiBtn').addEventListener('click', ()=> showToast('Emoji picker'));
+document.getElementById('chatBtn').addEventListener('click', ()=> showToast('Chat opened'));
+
+renderPieces();
+updateTurnBanner();
+updateScoreLine();
+</script>
 </body>
 </html>
