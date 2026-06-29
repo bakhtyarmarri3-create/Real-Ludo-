@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ludo Star - Premium Portal</title>
+<title>Ludo Star - Elite Network</title>
 <style>
   * { box-sizing: border-box; margin:0; padding:0; }
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(160deg, #3b1f5c, #2a1245 60%, #1c0a30);
+    background: linear-gradient(160deg, #1f0b35, #110520 60%, #05010d);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -18,164 +18,167 @@
     width: 420px;
     min-height: 100vh;
     position: relative;
-    padding: 20px 16px;
+    padding: 16px;
   }
-  
-  /* Shared Auth Styles */
-  .auth-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 28px;
-    padding: 30px 24px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-    text-align: center;
-    backdrop-filter: blur(15px);
-    margin-top: 40px;
-  }
-  .logo-area h1 { font-size: 32px; color: #f3c623; text-shadow: 0 3px 6px rgba(0,0,0,0.6); margin-bottom: 5px; }
-  .logo-area p { font-size: 13px; opacity: 0.7; margin-bottom: 25px; }
   
   .screen { display: none; }
   .screen.active { display: block; }
+
+  /* Auth / Card Shared */
+  .auth-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px; padding: 25px 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7); text-align: center;
+    backdrop-filter: blur(20px); margin-top: 30px;
+  }
+  .logo-area h1 { font-size: 34px; color: #f3c623; text-shadow: 0 4px 8px #000; }
+  .logo-area p { font-size: 13px; opacity: 0.6; margin-bottom: 20px; }
   
-  .input-group { text-align: left; margin-bottom: 15px; }
-  .input-group label { font-size: 13px; opacity: 0.8; margin-left: 4px; display: inline-block; margin-bottom: 5px; }
+  .input-group { text-align: left; margin-bottom: 14px; }
+  .input-group label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; display: inline-block; }
   
   input, select {
-    width: 100%; padding: 14px 16px;
-    border-radius: 14px; border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(0,0,0,0.4); color: #fff; font-size: 15px;
-    outline: none; transition: all 0.2s;
+    width: 100%; padding: 12px 14px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.5);
+    color: #fff; font-size: 14px; outline: none;
   }
-  input:focus, select:focus { border-color: #f3c623; box-shadow: 0 0 10px rgba(243,198,35,0.2); }
+  input:focus { border-color: #f3c623; }
   
   .btn-primary {
-    width: 100%; padding: 15px; margin-top: 10px;
-    border-radius: 14px; border: none;
+    width: 100%; padding: 14px; border-radius: 12px; border: none;
     background: linear-gradient(180deg, #fdd845, #f3c623); color: #1c0a30;
-    font-size: 16px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 5px 15px rgba(243,198,35,0.3);
-    transition: transform 0.1s;
+    font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(243,198,35,0.2);
   }
-  .btn-primary:active { transform: scale(0.97); }
-  
-  .switch-text { margin-top: 20px; font-size: 14px; opacity: 0.8; cursor: pointer; color: #5aa8ff; }
-  .switch-text:hover { text-decoration: underline; }
+  .btn-primary:active { transform: scale(0.98); }
+  .switch-text { margin-top: 15px; font-size: 13px; color: #5aa8ff; cursor: pointer; }
 
-  /* GAME DASHBOARD STYLES */
-  .dashboard {
-    animation: fadeIn 0.4s ease-out;
+  /* DUAL WALLETS DESIGN */
+  .wallets-container {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
   }
-  .dash-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+  .wallet-box {
+    background: linear-gradient(135deg, #2c1654, #190933);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+    padding: 12px; text-align: center; position: relative;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
   }
-  .profile-section { display: flex; align-items: center; gap: 12px; }
-  .avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #f3c623; background: #5c358d; display:flex; align-items:center; justify-content:center; font-size:20px; }
-  .p-name { font-weight: 700; font-size: 16px; }
-  .p-email { font-size: 12px; opacity: 0.6; }
-  
-  /* Elegant Interactive Wallet Button Card */
-  .wallet-widget {
-    background: linear-gradient(135deg, #4f2680, #341459);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 20px; padding: 18px; margin-bottom: 25px;
-    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: transform 0.2s;
-  }
-  .wallet-widget:hover { transform: translateY(-2px); border-color: #f3c623; }
-  
-  /* Wallet Drawer / Drawer Popup Area */
-  .wallet-drawer {
-    background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 16px; margin-bottom: 25px; display: none;
-    animation: slideDown 0.3s ease-out;
-  }
-  .wallet-drawer.open { display: block; }
-  .drawer-actions { display: flex; gap: 10px; margin-bottom: 15px; }
-  .drawer-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; }
-  .btn-dep { background: #1f9d4e; }
-  .btn-wd { background: #d32f2f; }
-  
-  /* Package Plan Grid inside Wallet Drawer */
-  .pkg-title { font-size: 14px; font-weight: 700; color: #f3c623; margin-bottom: 8px; text-align: left; }
-  .pkg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .pkg-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 10px; text-align: left; font-size: 12px; }
-  .pkg-card strong { color: #5aa8ff; display: block; margin-bottom: 2px; }
+  .wallet-box.real-money { border-color: #1f9d4e; }
+  .wallet-box.gold-money { border-color: #f3c623; }
+  .w-label { font-size: 11px; opacity: 0.7; text-transform: uppercase; }
+  .w-val { font-size: 18px; font-weight: 800; margin-top: 4px; }
+  .w-gold { color: #f3c623; }
+  .w-rs { color: #26de6e; }
 
-  /* Mode selection cards */
-  .lobby-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; text-align: left; }
-  .game-card {
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 18px; padding: 18px; margin-bottom: 12px; cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center; transition: all 0.2s;
+  /* Daily Bonus Shimmering Button */
+  .daily-btn {
+    background: linear-gradient(90deg, #e8b400, #ffea79); color: #000;
+    font-size: 11px; font-weight: 800; border: none; border-radius: 8px;
+    padding: 4px 8px; margin-top: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;
+    animation: pulseGlow 1.5s infinite;
   }
-  .game-card:hover { background: rgba(255,255,255,0.1); border-color: #f3c623; }
-  .gc-left { text-align: left; }
-  .gc-title { font-weight: 700; font-size: 16px; }
-  .gc-desc { font-size: 12px; opacity: 0.6; margin-top: 3px; }
-  .gc-icon { font-size: 32px; }
+  @keyframes pulseGlow { 0%,100% {transform: scale(1);} 50% {transform: scale(1.05); box-shadow: 0 0 10px #f3c623;} }
 
-  /* Deposit Modal / Popup Style */
+  .manage-w-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 10px; text-align: center; font-size: 13px;
+    cursor: pointer; color: #f3c623; margin-bottom: 20px; font-weight: 600;
+  }
+
+  /* LAYOUT OF GAME MODES (Square corners arrangement) */
+  .modes-grid {
+    display: flex; flex-direction: column; gap: 14px; margin-top: 10px;
+  }
+  .top-row-mode { width: 100%; }
+  .bottom-split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .mode-card-square {
+    background: linear-gradient(145deg, #25123e, #140724);
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 18px;
+    padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px;
+  }
+  .mode-card-square:hover { border-color: #f3c623; background: rgba(255,255,255,0.04); }
+  .mode-card-square .m-icon { font-size: 36px; margin-bottom: 6px; }
+  .mode-card-square .m-title { font-weight: 700; font-size: 15px; }
+  .mode-card-square .m-desc { font-size: 11px; opacity: 0.5; margin-top: 3px; }
+  
+  /* Highlight borders */
+  .mode-real { border-right: 4px solid #1f9d4e; border-bottom: 4px solid #1f9d4e; }
+  .mode-practice { border-left: 4px solid #f3c623; border-bottom: 4px solid #f3c623; }
+
+  /* Deposit Modal Style */
   .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    display: none; align-items: center; justify-content: center; z-index: 200;
-    padding: 16px; backdrop-filter: blur(5px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px;
   }
   .modal-overlay.open { display: flex; }
   .deposit-modal {
-    background: #2a1245; border: 2px solid #f3c623; width: 100%; max-width: 380px;
-    border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    background: #19082b; border: 2px solid #1f9d4e; width: 100%; max-width: 370px;
+    border-radius: 24px; padding: 20px; text-align: center;
   }
-  .deposit-modal h3 { color: #f3c623; margin-bottom: 15px; font-size: 20px; }
-  .payment-method-box {
-    background: rgba(255,255,255,0.08); border-radius: 14px; padding: 14px;
-    margin-bottom: 15px; text-align: left; border-left: 5px solid #1f9d4e;
+  .ep-info {
+    background: rgba(31, 157, 78, 0.15); border: 1px solid #1f9d4e;
+    border-radius: 12px; padding: 12px; text-align: left; margin-bottom: 12px;
   }
-  .method-title { font-size: 16px; font-weight: bold; color: #1f9d4e; display: flex; align-items: center; gap: 6px; }
-  .account-num { font-size: 18px; font-weight: 800; color: #fff; margin-top: 5px; letter-spacing: 1px; }
 
-  /* Toast Notification */
+  /* Admin Area Section */
+  .admin-panel {
+    margin-top: 35px; background: rgba(255,0,0,0.05); border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 16px; padding: 14px;
+  }
+  .admin-title { font-size: 13px; font-weight: bold; color: #ff5b5b; margin-bottom: 10px; text-align: left; }
+  .req-row {
+    background: #000; padding: 10px; border-radius: 10px; margin-bottom: 8px;
+    font-size: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center;
+  }
+  .btn-approve { background: #1f9d4e; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+  /* Toast */
   .toast {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    background: #f3c623; color: #1c0a30; padding: 12px 24px;
-    border-radius: 12px; font-size: 14px; font-weight: bold;
-    opacity: 0; transition: opacity 0.3s, top 0.3s; z-index: 300;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    background: #f3c623; color: #1c0a30; padding: 10px 20px;
+    border-radius: 10px; font-size: 13px; font-weight: bold;
+    opacity: 0; transition: opacity 0.3s; z-index: 300;
   }
-  .toast.show { opacity: 1; top: 30px; }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes slideDown { from { opacity: 0; max-height: 0; overflow: hidden; } to { opacity: 1; max-height: 500px; } }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
-<div class="toast" id="toast">Logged in successfully!</div>
+<div class="toast" id="toast"></div>
 
 <div class="modal-overlay" id="depositModal">
   <div class="deposit-modal">
-    <h3>EasyPaisa Deposit Setup</h3>
+    <h3 style="color:#26de6e; margin-bottom:12px;">EasyPaisa Deposit Portal</h3>
     
-    <div class="payment-method-box">
-      <div class="method-title">🟢 EasyPaisa Account</div>
-      <div class="account-num">03431289824</div>
-      <div style="font-size: 11px; opacity: 0.6; margin-top: 4px;">اس نمبر پر رقم بھیجنے کے بعد نیچے فارم بھریں۔</div>
+    <div class="ep-info">
+      <div style="font-weight:bold; color:#26de6e; font-size:15px;">🟢 EasyPaisa No:</div>
+      <div style="font-size: 20px; font-weight:800; margin-top:2px; letter-spacing:1px;">03431289824</div>
+      <div style="font-size:10px; opacity:0.6; margin-top:4px;">نوٹ: 3% سروس ٹیکس کٹ جائے گا۔ (مثال: 100 جمع کرنے پر 97 ملیں گے)</div>
     </div>
 
     <div class="input-group">
-      <label>Sent Amount (PKR)</label>
-      <input type="number" id="depAmount" placeholder="مثال: 1000">
+      <label>UID / Gmail Account</label>
+      <input type="text" id="depUid" readonly>
+    </div>
+
+    <div class="input-group">
+      <label>Amount to Send (PKR)</label>
+      <input type="number" id="depAmount" placeholder="Amount درج کریں" oninput="calculateNetDeposit()">
+      <div id="netEstimate" style="font-size:11px; text-align:right; margin-top:3px; color:#26de6e;">آپ کو ملیں گے: Rs 0</div>
     </div>
 
     <div class="input-group">
       <label>Transaction ID (TxID)</label>
-      <input type="text" id="depTxid" placeholder="Trx ID درج کریں">
+      <input type="text" id="depTxid" placeholder="Enter Trx ID">
     </div>
 
-    <button class="btn-primary" onclick="submitDeposit()">Submit Request</button>
-    <button onclick="closeDepositModal()" style="background: none; border: none; color: #ff5b5b; margin-top: 15px; cursor: pointer; font-size: 14px; font-weight: 600;">Cancel / Close</button>
+    <button class="btn-primary" onclick="submitDepositRequest()" style="background:linear-gradient(180deg, #26de6e, #1f9d4e); color:#fff;">Submit Request</button>
+    <button onclick="closeDepositModal()" style="background:none; border:none; color:#ff5b5b; margin-top:12px; cursor:pointer; font-size:12px;">Close</button>
   </div>
 </div>
+
 
 <div class="app">
 
@@ -183,24 +186,18 @@
     <div class="auth-card">
       <div class="logo-area">
         <h1>🏆 LUDO STAR</h1>
-        <p>Login to your account to play</p>
+        <p>Elite Platform Portal</p>
       </div>
-      
       <div class="input-group">
         <label>Gmail Address</label>
-        <input type="email" id="loginEmail" placeholder="example@gmail.com">
+        <input type="email" id="loginEmail" value="player1@gmail.com" placeholder="example@gmail.com">
       </div>
-      
       <div class="input-group">
         <label>Password</label>
-        <input type="password" id="loginPass" placeholder="••••••••">
+        <input type="password" id="loginPass" value="1234" placeholder="••••••••">
       </div>
-      
-      <button class="btn-primary" onclick="handleLogin()">Login</button>
-      
-      <div class="switch-text" onclick="switchScreen('registerScreen')">
-        Don't have an account? Register Now
-      </div>
+      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+      <div class="switch-text" onclick="switchScreen('registerScreen')">New User? Register here</div>
     </div>
   </div>
 
@@ -208,118 +205,111 @@
     <div class="auth-card">
       <div class="logo-area">
         <h1>🏆 LUDO STAR</h1>
-        <p>Create New Account & Get 5,000 Free Coins 🪙</p>
+        <p>Create Account & Get 5,000 Gold Coins Free</p>
       </div>
-      
       <div class="input-group">
         <label>Full Name</label>
-        <input type="text" id="regName" placeholder="Enter your name">
+        <input type="text" id="regName" placeholder="Enter Name">
       </div>
-      
       <div class="input-group">
         <label>Gmail Address</label>
-        <input type="email" id="regEmail" placeholder="yourname@gmail.com">
+        <input type="email" id="regEmail" placeholder="name@gmail.com">
       </div>
-      
       <div class="input-group">
-        <label>Create Password</label>
-        <input type="password" id="regPass" placeholder="Minimum 4 characters">
+        <label>Password</label>
+        <input type="password" id="regPass" placeholder="Min 4 chars">
       </div>
-      
-      <button class="btn-primary" onclick="handleRegister()">Create Account</button>
-      
-      <div class="switch-text" onclick="switchScreen('loginScreen')">
-        Already have an account? Login
-      </div>
+      <button class="btn-primary" onclick="handleRegister()">Register Account</button>
+      <div class="switch-text" onclick="switchScreen('loginScreen')">Already have account? Login</div>
     </div>
   </div>
 
   <div class="screen" id="dashboardScreen">
-    <div class="dashboard">
-      
-      <div class="dash-header">
-        <div class="profile-section">
-          <div class="avatar" id="userAvatar">🕹️</div>
-          <div style="text-align: left;">
-            <div class="p-name" id="dashName">Gamer</div>
-            <div class="p-email" id="dashEmail">gamer@gmail.com</div>
-          </div>
-        </div>
-        <button onclick="logout()" style="background:none; border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:8px; color:#ff5b5b; font-size:12px; cursor:pointer;">Logout</button>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <div>
+        <div class="p-name" id="dashName" style="font-size:16px; font-weight:bold;">GAMER</div>
+        <div class="p-email" id="dashEmail" style="font-size:11px; opacity:0.5;">gamer@gmail.com</div>
       </div>
+      <button onclick="logout()" style="background:none; border:1px solid rgba(255,255,255,0.15); padding:5px 10px; border-radius:8px; color:#ff5b5b; font-size:11px; cursor:pointer;">Logout</button>
+    </div>
 
-      <div class="wallet-widget" onclick="toggleWalletDrawer()">
-        <div style="text-align: left;">
-          <div style="font-size: 12px; opacity: 0.7;">Main Wallet Balance</div>
-          <div style="font-size: 22px; font-weight: 800; color: #f3c623; margin-top: 2px;">
-            🪙 <span id="dashCoins">0</span>
-          </div>
-        </div>
-        <div style="font-size: 13px; color: #f3c623; background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 10px;">
-          Manage Wallet ⚙️
-        </div>
+    <div class="wallets-container">
+      <div class="wallet-box gold-money">
+        <div class="w-label">🪙 Gold Balance</div>
+        <div class="w-val w-gold" id="dashGold">0</div>
+        <button class="daily-btn" id="dailyBonusBtn" onclick="claimDailyBonus()">🎁 Daily 500</button>
       </div>
-
-      <div class="wallet-drawer" id="walletDrawer">
-        <div class="drawer-actions">
-          <button class="btn-dep" onclick="openDepositModal(event)">➕ Deposit</button>
-          <button class="btn-wd" onclick="triggerAction('Withdraw Setup Clicked')">➖ Withdraw</button>
-        </div>
-        
-        <div class="pkg-title">Available Token & Mining Packages</div>
-        <div class="pkg-grid">
-          <div class="pkg-card" onclick="triggerAction('Silver Package Selected')">
-            <strong>🥈 Silver Plan</strong>
-            Cost: 10,000 Coins<br>Daily Return: 2%
-          </div>
-          <div class="pkg-card" onclick="triggerAction('Gold Package Selected')">
-            <strong>🥇 Gold Plan</strong>
-            Cost: 50,000 Coins<br>Daily Return: 3.5%
-          </div>
-        </div>
+      <div class="wallet-box real-money">
+        <div class="w-label">💵 Real Cash (Rs)</div>
+        <div class="w-val w-rs" id="dashRs">Rs 0</div>
+        <div id="depStatusDisplay" style="font-size:10px; color:#ffea79; margin-top:8px; font-weight:600;">Status: None</div>
       </div>
+    </div>
 
-      <div class="lobby-title">Select Table Bet</div>
-      <select id="tableBet" style="margin-bottom: 20px;">
-        <option value="500">Bet Room: 500 Coins 🪙</option>
-        <option value="2000">Bet Room: 2,000 Coins 🪙</option>
-        <option value="5000">Bet Room: 5,000 Coins 🪙</option>
-        <option value="10000">Bet Room: 10,000 Coins 🪙</option>
+    <div class="manage-w-btn" onclick="openDepositModal()">
+      💰 Click Here to Deposit EasyPaisa 💰
+    </div>
+
+    <div class="input-group" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:12px;">
+      <label style="color:#f3c623; font-weight:bold;">Select Game Table Bet Size:</label>
+      <select id="gameBetSelect">
+        <option value="10">Table Bet: 10 Rs / 500 Gold 🪙</option>
+        <option value="50">Table Bet: 50 Rs / 2,000 Gold 🪙</option>
+        <option value="100">Table Bet: 100 Rs / 5,000 Gold 🪙</option>
       </select>
+    </div>
 
-      <div class="lobby-title">Game Modes</div>
+    <div class="modes-grid">
       
-      <div class="game-card" onclick="playGameTable('computer')">
-        <div class="gc-left">
-          <div class="gc-title">Vs Computer (AI Bot)</div>
-          <div class="gc-desc">Test your skills offline against AI</div>
+      <div class="top-row-mode">
+        <div class="mode-card-square" onclick="launchGame('computer')">
+          <div class="m-icon">🤖</div>
+          <div class="m-title">Vs Computer (AI Mode)</div>
+          <div class="m-desc">Offline training against Smart Engine</div>
         </div>
-        <div class="gc-icon">🤖</div>
       </div>
 
-      <div class="game-card" onclick="playGameTable('friends')">
-        <div class="gc-left">
-          <div class="gc-title">Local Pass & Play</div>
-          <div class="gc-desc">Play locally with friends on this device</div>
+      <div class="bottom-split-row">
+        
+        <div class="mode-card-square mode-practice" onclick="launchGame('practice')">
+          <div class="m-icon">🏆</div>
+          <div class="m-title">Practice Match</div>
+          <div class="m-desc">Play with Free Gold Coins</div>
         </div>
-        <div class="gc-icon">👥</div>
+
+        <div class="mode-card-square mode-real" onclick="launchGame('real')">
+          <div class="m-icon">💰</div>
+          <div class="m-title">Real Game</div>
+          <div class="m-desc">Win Cash (Rs 10 Bet = Rs 9 Match)</div>
+        </div>
+
       </div>
 
     </div>
+
+    <div class="admin-panel">
+      <div class="admin-title">🛠️ Admin Approvals Panel (Live Feed)</div>
+      <div id="adminQueue" style="min-height:30px; color:rgba(255,255,255,0.4); font-size:11px; text-align:center; padding-top:5px;">
+        کوئی پینڈنگ ریکویسٹ نہیں ہے۔
+      </div>
+    </div>
+
   </div>
 
 </div>
 
 <script>
-  // Local Database Object
-  let database = JSON.parse(localStorage.getItem('ludo_db')) || {};
-  let sessionUser = localStorage.getItem('ludo_session') || null;
+  // Initial setup database
+  let db = JSON.parse(localStorage.getItem('ludo_db2')) || {
+    "player1@gmail.com": { name: "Player One", password: "1234", gold: 5000, rs: 0, lastBonus: 0, depStatus: "None" }
+  };
+  let currentSession = localStorage.getItem('ludo_session2') || null;
+  let adminRequests = JSON.parse(localStorage.getItem('ludo_admin_reqs')) || [];
 
   function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+    const t = document.getElementById('toast'); t.textContent = msg;
+    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200);
   }
 
   function switchScreen(id) {
@@ -327,141 +317,166 @@
     document.getElementById(id).classList.add('active');
   }
 
-  // Registration Handler
   function handleRegister() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim().toLowerCase();
     const pass = document.getElementById('regPass').value.trim();
-
-    if(!name || !email || !pass) {
-      showToast('Please fill all fields properly!');
-      return;
-    }
-    if(!email.includes('@') || !email.includes('.')) {
-      showToast('Invalid Gmail/Email address!');
-      return;
-    }
-    if(pass.length < 4) {
-      showToast('Password must be at least 4 characters');
-      return;
-    }
-    if(database[email]) {
-      showToast('Account already exists! Please Login.');
-      return;
-    }
-
-    // Save user with 5,000 free signup coins
-    database[email] = { name: name, password: pass, coins: 5000 };
-    localStorage.setItem('ludo_db', JSON.stringify(database));
+    if(!name || !email || !pass) return showToast('تمام خانے پُر کریں!');
+    if(db[email]) return showToast('اکاؤنٹ پہلے سے موجود ہے!');
     
-    showToast('Account Created! 5,000 Free Coins Gifted 🪙');
-    
-    // Switch to login right after registration so they can sign in cleanly
-    setTimeout(() => { switchScreen('loginScreen'); }, 1500);
+    db[email] = { name: name, password: pass, gold: 5000, rs: 0, lastBonus: 0, depStatus: "None" };
+    saveData();
+    showToast('اکاؤنٹ بن گیا! 5000 فری گولڈ کوائنز مل گئے 🪙');
+    switchScreen('loginScreen');
   }
 
-  // Login Handler
   function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
     const pass = document.getElementById('loginPass').value.trim();
-
-    if(!database[email] || database[email].password !== pass) {
-      showToast('Invalid Email or Password!');
-      return;
-    }
-
-    // Session verification step
-    sessionUser = email;
-    localStorage.setItem('ludo_session', email);
+    if(!db[email] || db[email].password !== pass) return showToast('غلط ای میل یا پاس ورڈ!');
     
-    showToast('Logged in successfully! 🎉');
-    setTimeout(() => { loadDashboardData(); }, 1000);
+    currentSession = email;
+    localStorage.setItem('ludo_session2', email);
+    showToast('خوش آمدید! لاگ ان کامیاب 🎉');
+    loadDashboard();
   }
 
-  // Dashboard Loader
-  function loadDashboardData() {
-    if(!sessionUser || !database[sessionUser]) return;
-
-    const user = database[sessionUser];
+  function loadDashboard() {
+    if(!currentSession || !db[currentSession]) return;
+    const user = db[currentSession];
     document.getElementById('dashName').textContent = user.name.toUpperCase();
-    document.getElementById('dashEmail').textContent = sessionUser;
-    document.getElementById('dashCoins').textContent = user.coins.toLocaleString();
-    document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
-
+    document.getElementById('dashEmail').textContent = currentSession;
+    document.getElementById('dashGold').textContent = user.gold.toLocaleString();
+    document.getElementById('dashRs').textContent = "Rs " + user.rs.toLocaleString();
+    document.getElementById('depStatusDisplay').textContent = "Status: " + (user.depStatus || "None");
+    
+    document.getElementById('depUid').value = currentSession;
     switchScreen('dashboardScreen');
+    renderAdminPanel();
   }
 
-  // Wallet Drawer Toggle
-  function toggleWalletDrawer() {
-    const drawer = document.getElementById('walletDrawer');
-    drawer.classList.toggle('open');
+  function claimDailyBonus() {
+    const user = db[currentSession];
+    const now = new Date().getTime();
+    // 24 hours check (86400000 ms)
+    if (user.lastBonus && (now - user.lastBonus < 86400000)) {
+      return showToast('آپ آج کا فری بونس لے چکے ہیں! کل دوبارہ آئیں۔');
+    }
+    user.gold += 500;
+    user.lastBonus = now;
+    saveData();
+    loadDashboard();
+    showToast('روزانہ کا 500 گولڈ بونس ایڈ ہو گیا! 🎁');
   }
 
-  // Deposit Popup Handlers
-  function openDepositModal(event) {
-    event.stopPropagation(); // Prevents drawer from closing automatically
+  function openDepositModal() {
     document.getElementById('depositModal').classList.add('open');
   }
-
   function closeDepositModal() {
     document.getElementById('depositModal').classList.remove('open');
     document.getElementById('depAmount').value = '';
     document.getElementById('depTxid').value = '';
   }
 
-  function submitDeposit() {
-    const amount = document.getElementById('depAmount').value.trim();
+  function calculateNetDeposit() {
+    const amt = parseFloat(document.getElementById('depAmount').value) || 0;
+    if(amt <= 0) {
+      document.getElementById('netEstimate').textContent = "آپ کو ملیں گے: Rs 0";
+      return;
+    }
+    const net = amt - (amt * 0.03); // 3% fee deduction
+    document.getElementById('netEstimate').textContent = `آپ کو ملیں گے: Rs ${net.toFixed(1)} (3% فیس کٹ کے)`;
+  }
+
+  function submitDepositRequest() {
+    const amt = parseFloat(document.getElementById('depAmount').value);
     const txid = document.getElementById('depTxid').value.trim();
+    if(!amt || amt <= 0 || !txid) return showToast('براہ کرم درست رقم اور TxID لکھیں!');
 
-    if(!amount || !txid) {
-      showToast('براہ کرم تمام معلومات درست درج کریں!');
-      return;
-    }
-
-    showToast(`درخواست موصول ہو گئی! TxID: ${txid} کی تصدیق کی جا رہی ہے۔`);
-    closeDepositModal();
-  }
-
-  // Action placeholder helper
-  function triggerAction(actionName) {
-    showToast(`${actionName}`);
-  }
-
-  // Game Launcher with Automatic Coin Deduction
-  function playGameTable(mode) {
-    const betAmount = parseInt(document.getElementById('tableBet').value);
-    const user = database[sessionUser];
-
-    if(user.coins < betAmount) {
-      showToast(`Insufficient coins! You need ${betAmount} coins.`);
-      return;
-    }
-
-    // Deduct coins live
-    user.coins -= betAmount;
-    localStorage.setItem('ludo_db', JSON.stringify(database));
-    document.getElementById('dashCoins').textContent = user.coins.toLocaleString();
-
-    showToast(`Table joined! ${betAmount} Coins deducted.`);
+    const netAmount = amt - (amt * 0.03);
     
-    setTimeout(() => {
-      // Safely redirects to your clean ludo board file
-      window.location.href = `game.html?mode=${mode}&bet=${betAmount}`;
-    }, 1200);
+    // Add request to global admin array
+    const req = { id: Date.now(), user: currentSession, rawAmount: amt, netAmount: netAmount, txid: txid };
+    adminRequests.push(req);
+    localStorage.setItem('ludo_admin_reqs', JSON.stringify(adminRequests));
+
+    db[currentSession].depStatus = "Pending ⏳";
+    saveData();
+    loadDashboard();
+    closeDepositModal();
+    showToast('Successful Deposit! پینڈنگ ریکارڈ ایڈمن پینل چلا گیا ہے۔');
   }
 
-  function logout() {
-    localStorage.removeItem('ludo_session');
-    sessionUser = null;
-    switchScreen('loginScreen');
-  }
-
-  // Check ongoing session on load
-  window.onload = function() {
-    if(sessionUser && database[sessionUser]) {
-      loadDashboardData();
+  // Admin Engine Functionality
+  function renderAdminPanel() {
+    const queue = document.getElementById('adminQueue');
+    if(adminRequests.length === 0) {
+      queue.innerHTML = `<div style="text-align:center; opacity:0.5;">کوئی پینڈنگ ریکویسٹ نہیں ہے۔</div>`;
+      return;
     }
-  };
+    queue.innerHTML = '';
+    adminRequests.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'req-row';
+      div.innerHTML = `
+        <div>
+          <strong>${r.user.split('@')}</strong> -> Tx: ${r.txid}<br>
+          <span style="color:#26de6e;">Net: Rs ${r.netAmount.toFixed(1)}</span> (Raw: ${r.rawAmount})
+        </div>
+        <button class="btn-approve" onclick="approveDeposit(${r.id})">Approve</button>
+      `;
+      queue.appendChild(div);
+    });
+  }
+
+  function approveDeposit(reqId) {
+    const reqIndex = adminRequests.findIndex(r => r.id === reqId);
+    if(reqIndex === -1) return;
+    const req = adminRequests[reqIndex];
+
+    if(db[req.user]) {
+      db[req.user].rs += req.netAmount;
+      db[req.user].depStatus = "Successful ✅";
+    }
+
+    adminRequests.splice(reqIndex, 1);
+    localStorage.setItem('ludo_admin_reqs', JSON.stringify(adminRequests));
+    saveData();
+    loadDashboard();
+    showToast('ڈپوزٹ کامیابی سے منظور کر لیا گیا ہے!');
+  }
+
+  function launchGame(mode) {
+    const bet = parseInt(document.getElementById('gameBetSelect').value);
+    const user = db[currentSession];
+
+    if(mode === 'real') {
+      if(user.rs < bet) return showToast(`کھیلنے کے لیے کم از کم Rs ${bet} ہونا ضروری ہے!`);
+      user.rs -= bet;
+      saveData();
+      loadDashboard();
+      const matchValue = bet - (bet * 0.10); // 10% match fee deduction sample (1 rupee out of 10)
+      showToast(`ریئل میچ لگ گیا! Rs ${bet} کٹ گئے (میچ ویلیو: Rs ${bet - 1})`);
+    } else if(mode === 'practice') {
+      const goldBet = bet === 10 ? 500 : (bet === 50 ? 2000 : 5000);
+      if(user.gold < goldBet) return showToast(`آپ کے پاس کوائنز کم ہیں!`);
+      user.gold -= goldBet;
+      saveData();
+      loadDashboard();
+      showToast(`پریکٹس میچ شروع! ${goldBet} گولڈ کٹ گئے۔`);
+    } else {
+      showToast('کمپیوٹر موڈ بوٹ میچ شروع ہو رہا ہے!');
+    }
+
+    setTimeout(() => {
+      window.location.href = `game.html?mode=${mode}&bet=${bet}`;
+    }, 1500);
+  }
+
+  function saveData() { localStorage.setItem('ludo_db2', JSON.stringify(db)); }
+  function logout() { localStorage.removeItem('ludo_session2'); currentSession = null; switchScreen('loginScreen'); }
+
+  window.onload = function() { if(currentSession) loadDashboard(); };
 </script>
 </body>
 </html>
