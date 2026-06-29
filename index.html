@@ -230,7 +230,7 @@
       <div class="wallet-box real-money">
         <div class="w-label">💵 Real Cash</div>
         <div class="w-val w-rs" id="dashRs">Rs 0</div>
-        <div id="depStatusDisplay" style="font-size:10px; color:#ff9800; margin-top:8px;">Status: None</div>
+        <div id="depStatusDisplay" style="font-size:10px; color:#26de6e; margin-top:8px;">Status: None</div>
       </div>
     </div>
 
@@ -245,18 +245,18 @@
 
     <div style="font-size:14px; font-weight:bold; text-align:left; margin-bottom:5px; color:#ffea79;">Select Arena Mode:</div>
     
-    <!-- 4 Balanced Clear Game Modes Grid -->
+    <!-- FIX: Redirects directly to real game page without altering balance here -->
     <div class="modes-grid-4">
-      <div class="mode-card-square border-purple" onclick="fakePlayMatch('computer')">
+      <div class="mode-card-square border-purple" onclick="realLaunchGame('computer')">
         <div style="font-size:30px;">🤖</div><div style="font-weight:700; font-size:13px; margin-top:4px;">Vs Computer</div>
       </div>
-      <div class="mode-card-square border-orange" onclick="fakePlayMatch('quick')">
+      <div class="mode-card-square border-orange" onclick="realLaunchGame('quick')">
         <div style="font-size:30px;">⚡</div><div style="font-weight:700; font-size:13px; margin-top:4px;">Quick Game</div>
       </div>
-      <div class="mode-card-square border-yellow" onclick="fakePlayMatch('practice')">
+      <div class="mode-card-square border-yellow" onclick="realLaunchGame('practice')">
         <div style="font-size:30px;">🏆</div><div style="font-weight:700; font-size:13px; margin-top:4px;">Practice Match</div>
       </div>
-      <div class="mode-card-square border-green" onclick="fakePlayMatch('2player')">
+      <div class="mode-card-square border-green" onclick="realLaunchGame('2player')">
         <div style="font-size:30px;">👥</div><div style="font-weight:700; font-size:13px; margin-top:4px;">2 Players Game</div>
       </div>
     </div>
@@ -357,7 +357,6 @@
     document.getElementById('dashRs').textContent = "Rs " + user.rs.toLocaleString();
     document.getElementById('depStatusDisplay').textContent = "Status: " + (user.depStatus || "None");
     
-    // Render user statement history logs
     const hBox = document.getElementById('userHistoryBox');
     hBox.innerHTML = '';
     if(!user.history || user.history.length === 0) {
@@ -370,7 +369,6 @@
     switchScreen('dashboardScreen');
   }
 
-  // ☰ Dropdown Actions Toggle Open
   function openMenuModal() { document.getElementById('menuModal').classList.add('open'); }
   function closeMenuModal() { document.getElementById('menuModal').classList.remove('open'); }
 
@@ -433,21 +431,13 @@
     showToast('500 گولڈ کوائنز مل گئے! 🎁');
   }
 
-  function fakePlayMatch(mode) {
+  // FIXED REAL NAVIGATION TRIGGER
+  function realLaunchGame(mode) {
     const bet = parseInt(document.getElementById('gameBetSelect').value);
-    // Loss/Win Simulator logic for logging demonstration
-    const win = Math.random() > 0.4; 
-    if(win) {
-      db[currentSession].rs += bet;
-      db[currentSession].history.push({t: `Won Match (${mode})`, a: `+Rs ${bet}`});
-      showToast(`🏆 آپ میچ جیت گئے! +Rs ${bet}`);
-    } else {
-      db[currentSession].rs -= Math.floor(bet/2);
-      db[currentSession].history.push({t: `Lost Match (${mode})`, a: `-Rs ${Math.floor(bet/2)}`});
-      showToast(`❌ آپ میچ ہار گئے! -Rs ${Math.floor(bet/2)}`);
-    }
-    saveAll();
-    loadDashboard();
+    showToast(`🎮 میچ لوڈ ہو رہا ہے موڈ: ${mode.toUpperCase()}...`);
+    setTimeout(() => {
+      window.location.href = `game.html?mode=${mode}&bet=${bet}`;
+    }, 1200);
   }
 
   // ================= ADMIN SYSTEM IMPLEMENTATION =================
@@ -457,7 +447,6 @@
     document.getElementById('cntDeps').textContent = adminReqs.length;
     document.getElementById('cntWiths').textContent = adminWiths.length;
 
-    // Render registered users
     const utable = document.getElementById('admUsersTable');
     utable.innerHTML = '';
     usersKeys.forEach(k => {
@@ -469,7 +458,6 @@
       utable.appendChild(tr);
     });
 
-    // Render Deposits list Queue
     const dBox = document.getElementById('admDepsQueue');
     dBox.innerHTML = adminReqs.length === 0 ? 'کوئی ڈپازٹ درخواست نہیں ہے' : '';
     adminReqs.forEach(r => {
@@ -479,7 +467,6 @@
       </div>`;
     });
 
-    // Render Withdraw Queue
     const wBox = document.getElementById('admWithsQueue');
     wBox.innerHTML = adminWiths.length === 0 ? 'کوئی ودڈرا درخواست نہیں ہے' : '';
     adminWiths.forEach(w => {
@@ -512,7 +499,7 @@
     if(db[r.user]) {
       db[r.user].rs += r.net;
       db[r.user].depStatus = "Approved ✅";
-      db[r.user].history.push({t: "Deposit Approved By Admin", a: `+Rs ${r.net}`});
+      db[r.user].history.push({t: "Deposit Approved", a: `+Rs ${r.net}`});
     }
     adminReqs.splice(idx, 1);
     localStorage.setItem('ludo_admin_reqs4', JSON.stringify(adminReqs));
@@ -534,7 +521,6 @@
   function saveAll() { localStorage.setItem('ludo_db4', JSON.stringify(db)); }
   function logout() { localStorage.removeItem('ludo_session4'); currentSession = null; switchScreen('loginScreen'); }
 
-  // REFRESH PROTECTION LOGIC ON WINDOW LOAD
   window.onload = function() {
     if(currentSession === "ADMIN_ROOM") {
       loadAdminPanel();
