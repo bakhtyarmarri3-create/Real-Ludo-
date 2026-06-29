@@ -115,12 +115,31 @@
   .gc-desc { font-size: 12px; opacity: 0.6; margin-top: 3px; }
   .gc-icon { font-size: 32px; }
 
+  /* Deposit Modal / Popup Style */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    display: none; align-items: center; justify-content: center; z-index: 200;
+    padding: 16px; backdrop-filter: blur(5px);
+  }
+  .modal-overlay.open { display: flex; }
+  .deposit-modal {
+    background: #2a1245; border: 2px solid #f3c623; width: 100%; max-width: 380px;
+    border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+  }
+  .deposit-modal h3 { color: #f3c623; margin-bottom: 15px; font-size: 20px; }
+  .payment-method-box {
+    background: rgba(255,255,255,0.08); border-radius: 14px; padding: 14px;
+    margin-bottom: 15px; text-align: left; border-left: 5px solid #1f9d4e;
+  }
+  .method-title { font-size: 16px; font-weight: bold; color: #1f9d4e; display: flex; align-items: center; gap: 6px; }
+  .account-num { font-size: 18px; font-weight: 800; color: #fff; margin-top: 5px; letter-spacing: 1px; }
+
   /* Toast Notification */
   .toast {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: #f3c623; color: #1c0a30; padding: 12px 24px;
     border-radius: 12px; font-size: 14px; font-weight: bold;
-    opacity: 0; transition: opacity 0.3s, top 0.3s; z-index: 100;
+    opacity: 0; transition: opacity 0.3s, top 0.3s; z-index: 300;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   }
   .toast.show { opacity: 1; top: 30px; }
@@ -133,9 +152,33 @@
 
 <div class="toast" id="toast">Logged in successfully!</div>
 
+<div class="modal-overlay" id="depositModal">
+  <div class="deposit-modal">
+    <h3>EasyPaisa Deposit Setup</h3>
+    
+    <div class="payment-method-box">
+      <div class="method-title">🟢 EasyPaisa Account</div>
+      <div class="account-num">03431289824</div>
+      <div style="font-size: 11px; opacity: 0.6; margin-top: 4px;">اس نمبر پر رقم بھیجنے کے بعد نیچے فارم بھریں۔</div>
+    </div>
+
+    <div class="input-group">
+      <label>Sent Amount (PKR)</label>
+      <input type="number" id="depAmount" placeholder="مثال: 1000">
+    </div>
+
+    <div class="input-group">
+      <label>Transaction ID (TxID)</label>
+      <input type="text" id="depTxid" placeholder="Trx ID درج کریں">
+    </div>
+
+    <button class="btn-primary" onclick="submitDeposit()">Submit Request</button>
+    <button onclick="closeDepositModal()" style="background: none; border: none; color: #ff5b5b; margin-top: 15px; cursor: pointer; font-size: 14px; font-weight: 600;">Cancel / Close</button>
+  </div>
+</div>
+
 <div class="app">
 
-  <!-- ================= SCREEN 1: LOGIN ================= -->
   <div class="screen active" id="loginScreen">
     <div class="auth-card">
       <div class="logo-area">
@@ -161,7 +204,6 @@
     </div>
   </div>
 
-  <!-- ================= SCREEN 2: REGISTER ================= -->
   <div class="screen" id="registerScreen">
     <div class="auth-card">
       <div class="logo-area">
@@ -192,11 +234,9 @@
     </div>
   </div>
 
-  <!-- ================= SCREEN 3: PLATFORM/GAME DASHBOARD ================= -->
   <div class="screen" id="dashboardScreen">
     <div class="dashboard">
       
-      <!-- Top Profile Area -->
       <div class="dash-header">
         <div class="profile-section">
           <div class="avatar" id="userAvatar">🕹️</div>
@@ -208,7 +248,6 @@
         <button onclick="logout()" style="background:none; border:1px solid rgba(255,255,255,0.2); padding:6px 12px; border-radius:8px; color:#ff5b5b; font-size:12px; cursor:pointer;">Logout</button>
       </div>
 
-      <!-- Wallet Interactive Widget (Click to Expand) -->
       <div class="wallet-widget" onclick="toggleWalletDrawer()">
         <div style="text-align: left;">
           <div style="font-size: 12px; opacity: 0.7;">Main Wallet Balance</div>
@@ -221,14 +260,12 @@
         </div>
       </div>
 
-      <!-- Expandable Wallet Drawer (Deposit, Withdraw, Mining Packages) -->
       <div class="wallet-drawer" id="walletDrawer">
         <div class="drawer-actions">
-          <button class="btn-dep" onclick="triggerAction('Deposit Setup Clicked')">➕ Deposit</button>
+          <button class="btn-dep" onclick="openDepositModal(event)">➕ Deposit</button>
           <button class="btn-wd" onclick="triggerAction('Withdraw Setup Clicked')">➖ Withdraw</button>
         </div>
         
-        <!-- Premium Mining / Staking Packages Section -->
         <div class="pkg-title">Available Token & Mining Packages</div>
         <div class="pkg-grid">
           <div class="pkg-card" onclick="triggerAction('Silver Package Selected')">
@@ -242,7 +279,6 @@
         </div>
       </div>
 
-      <!-- Game Room / Matching Setup -->
       <div class="lobby-title">Select Table Bet</div>
       <select id="tableBet" style="margin-bottom: 20px;">
         <option value="500">Bet Room: 500 Coins 🪙</option>
@@ -359,6 +395,31 @@
   function toggleWalletDrawer() {
     const drawer = document.getElementById('walletDrawer');
     drawer.classList.toggle('open');
+  }
+
+  // Deposit Popup Handlers
+  function openDepositModal(event) {
+    event.stopPropagation(); // Prevents drawer from closing automatically
+    document.getElementById('depositModal').classList.add('open');
+  }
+
+  function closeDepositModal() {
+    document.getElementById('depositModal').classList.remove('open');
+    document.getElementById('depAmount').value = '';
+    document.getElementById('depTxid').value = '';
+  }
+
+  function submitDeposit() {
+    const amount = document.getElementById('depAmount').value.trim();
+    const txid = document.getElementById('depTxid').value.trim();
+
+    if(!amount || !txid) {
+      showToast('براہ کرم تمام معلومات درست درج کریں!');
+      return;
+    }
+
+    showToast(`درخواست موصول ہو گئی! TxID: ${txid} کی تصدیق کی جا رہی ہے۔`);
+    closeDepositModal();
   }
 
   // Action placeholder helper
