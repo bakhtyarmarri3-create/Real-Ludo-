@@ -3,554 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ludo Star - Ultimate Network</title>
+<title>Ludo Play Arena</title>
 <style>
-  * { box-sizing: border-box; margin:0; padding:0; }
   body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(160deg, #1f0b35, #110520 60%, #05010d);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    color: #fff;
+    margin: 0; padding: 16px; background: #0b0214; color: #fff;
+    font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center;
   }
-  .app { width: 420px; min-height: 100vh; position: relative; padding: 16px; }
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  /* Auth UI */
-  .auth-card {
-    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 28px; padding: 25px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.7);
-    text-align: center; backdrop-filter: blur(20px); margin-top: 30px;
+  .header-bar { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .ludo-board {
+    width: 360px; height: 360px; background: #ebdcb9; border: 4px solid #331404;
+    display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr);
+    position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
   }
-  .logo-area h1 { font-size: 34px; color: #f3c623; text-shadow: 0 4px 8px #000; }
-  .logo-area p { font-size: 13px; opacity: 0.6; margin-bottom: 20px; }
-  .input-group { text-align: left; margin-bottom: 14px; }
-  .input-group label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; display: inline-block; }
-  input, select {
-    width: 100%; padding: 12px 14px; border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.5); color: #fff; font-size: 14px; outline: none;
-  }
-  input:focus { border-color: #f3c623; }
-  .btn-primary {
-    width: 100%; padding: 14px; border-radius: 12px; border: none;
-    background: linear-gradient(180deg, #fdd845, #f3c623); color: #1c0a30;
-    font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(243,198,35,0.2);
-  }
-  .switch-text { margin-top: 15px; font-size: 13px; color: #5aa8ff; cursor: pointer; }
-
-  /* Wallets & Grid */
-  .wallets-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-  .wallet-box {
-    background: linear-gradient(135deg, #2c1654, #190933); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px; padding: 12px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-  }
-  .wallet-box.real-money { border-color: #1f9d4e; }
-  .wallet-box.gold-money { border-color: #f3c623; }
-  .w-label { font-size: 11px; opacity: 0.7; }
-  .w-val { font-size: 18px; font-weight: 800; margin-top: 4px; }
-  .w-gold { color: #f3c623; }
-  .w-rs { color: #26de6e; }
-  .daily-btn {
-    background: linear-gradient(90deg, #e8b400, #ffea79); color: #000; font-size: 11px;
-    font-weight: 800; border: none; border-radius: 8px; padding: 4px 8px; margin-top: 6px; cursor: pointer;
-  }
-
-  .modes-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 15px; }
-  .mode-card-square {
-    background: linear-gradient(145deg, #25123e, #140724); border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 18px; padding: 16px; text-align: center; cursor: pointer; min-height: 115px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-  .border-purple { border-top: 3px solid #9c27b0; }
-  .border-orange { border-top: 3px solid #ff9800; }
-  .border-yellow { border-top: 3px solid #f3c623; }
-  .border-green { border-top: 3px solid #1f9d4e; }
-
-  /* Modals */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-    display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px;
-  }
-  .modal-overlay.open { display: flex; }
-  .custom-modal {
-    background: #19082b; border: 2px solid #f3c623; width: 100%; max-width: 380px;
-    border-radius: 24px; padding: 20px; text-align: center; max-height: 85vh; overflow-y: auto;
-  }
-  .modal-pkg-card {
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px; padding: 10px; text-align: left; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-  }
-
-  /* Admin Dashboard Counters */
-  .admin-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-  .stat-box { background: #140724; padding: 10px 5px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-  .stat-box h4 { font-size: 11px; opacity: 0.7; }
-  .stat-box p { font-size: 18px; font-weight: bold; color: #f3c623; margin-top: 2px; }
-
-  .hist-item { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px; margin-bottom: 6px; font-size: 11px; text-align: left; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; margin-top: 5px; }
-  th, td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  th { color: #f3c623; }
+  .zone { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; position: relative; }
   
-  .toast {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #f3c623; color: #1c0a30;
-    padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: bold; opacity: 0; z-index: 300; transition: 0.3s;
+  /* Home Bases */
+  .red-home { grid-column: 1/7; grid-row: 1/7; background: #ff2a2a; border: 2px solid #333; }
+  .green-home { grid-column: 10/16; grid-row: 1/7; background: #12c140; border: 2px solid #333; }
+  .yellow-home { grid-column: 10/16; grid-row: 10/16; background: #f1bf12; border: 2px solid #333; }
+  .blue-home { grid-column: 1/7; grid-row: 10/16; background: #1282f1; border: 2px solid #333; }
+  .center-home { grid-column: 7/10; grid-row: 7/10; background: linear-gradient(45deg, red, green, blue, yellow); border: 1px solid #000; }
+
+  /* Dice Controls */
+  .control-box {
+    width: 100%; max-width: 400px; background: rgba(255,255,255,0.05);
+    margin-top: 15px; padding: 12px; border-radius: 12px; text-align: center;
   }
-  .toast.show { opacity: 1; }
-  .lang-btn {
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;
+  .dice-btn {
+    padding: 10px 24px; font-size: 16px; font-weight: bold; background: #f3c623;
+    border: none; border-radius: 8px; cursor: pointer; color: #000; margin-top: 6px;
   }
+  .btn-leave {
+    background: #ff3333; color: #fff; border: none; padding: 8px 16px;
+    border-radius: 6px; cursor: pointer; font-weight: bold;
+  }
+  .timer-banner { font-size: 14px; font-weight: bold; padding: 4px 10px; border-radius: 5px; margin-bottom: 5px; display: inline-block; }
+  .p-indicator { font-size: 15px; font-weight: bold; margin-bottom: 8px; }
+  
+  /* Token Visuals */
+  .token {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4); display: inline-block; margin: 2px;
+  }
+  .t-red { background: #ff0000; }
+  .t-green { background: #00ff00; }
+  .t-yellow { background: #ffff00; }
+  .t-blue { background: #0000ff; }
 </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
-
-<!-- ================= ☰ MAIN MENU MODAL ================= -->
-<div class="modal-overlay" id="menuModal">
-  <div class="custom-modal">
-    <h3 style="color:#f3c623; margin-bottom:12px;" data-en="🏆 Premium Account Room" data-ur="🏆 پریمیم اکاؤنٹ روم">🏆 Premium Account Room</h3>
-    
-    <div style="background:rgba(31, 157, 78, 0.15); border:1px solid #1f9d4e; border-radius:12px; padding:8px; text-align:left; margin-bottom:12px; font-size:12px;">
-      <span style="color:#26de6e; font-weight:bold;" id="txtTillNumber">🟢 EasyPaisa / JazzCash Till: 03431289824</span>
-    </div>
-
-    <div style="text-align:left; font-size:11px; margin-bottom:4px; font-weight:bold; color:#26de6e;" data-en="👉 Deposit Section:" data-ur="👉 رقم جمع کرنے کا طریقہ:">👉 Deposit Section:</div>
-    <input type="number" id="menuDepAmt" placeholder="Amount (Rs)" style="margin-bottom:6px;" oninput="calcMenuFee()">
-    <div id="menuFeeNotice" style="font-size:11px; text-align:right; color:#26de6e; margin-bottom:6px;" data-en="Net Amount: Rs 0" data-ur="نیٹ رقم: Rs 0">Net Amount: Rs 0</div>
-    <input type="text" id="menuDepTx" placeholder="Transaction ID (TxID)" style="margin-bottom:10px;">
-    <button class="btn-primary" onclick="submitMenuDeposit()" style="background:#1f9d4e; color:#fff; padding:10px; margin-bottom:15px;" data-en="➕ Submit Deposit" data-ur="➕ ڈپازٹ ریکویسٹ بھیجیں">➕ Submit Deposit</button>
-
-    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:11px; margin-bottom:6px; font-weight:bold; color:#ff5b5b;" data-en="👉 Withdraw Section:" data-ur="👉 رقم نکالنے کا طریقہ:">👉 Withdraw Section:</div>
-    
-    <select id="withdrawMethod" style="margin-bottom:6px;">
-      <option value="easypaisa" data-en="EasyPaisa Mobile Account" data-ur="ایزی پیسہ موبائل اکاؤنٹ">EasyPaisa Mobile Account</option>
-      <option value="jazzcash" data-en="JazzCash Mobile Account" data-ur="جاز کیش موبائل اکاؤنٹ">JazzCash Mobile Account</option>
-    </select>
-    <input type="text" id="withdrawNum" placeholder="Account Number" style="margin-bottom:6px;">
-    <input type="text" id="withdrawName" placeholder="Account Holder Name" style="margin-bottom:6px;">
-    <input type="number" id="withdrawAmt" placeholder="Withdraw Amount (Rs)" style="margin-bottom:10px;">
-    
-    <button class="btn-primary" onclick="submitMenuWithdraw()" style="background:#d32f2f; color:#fff; padding:10px; margin-bottom:15px;" data-en="➖ Submit Withdraw Request" data-ur="➖ ودڈر ریکویسٹ بھیجیں">➖ Submit Withdraw Request</button>
-
-    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:12px; font-weight:bold; color:#f3c623; margin-bottom:8px;" data-en="Premium Mining Packages" data-ur="پریمیم مائننگ پیکجز">Premium Mining Packages</div>
-    <div class="modal-pkg-card">
-      <div><strong id="titleSilver">🥈 Silver Plan</strong><br><span style="font-size:10px; opacity:0.6;" id="descSilver">10,000 Gold Coin | 2% Daily</span></div>
-      <button style="background:#f3c623; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="buyPackage('Silver Plan', 10000)" data-en="Subscribe" data-ur="خریدیں">Subscribe</button>
-    </div>
-    <div class="modal-pkg-card">
-      <div><strong id="titleGold">🥇 Gold Plan</strong><br><span style="font-size:10px; opacity:0.6;" id="descGold">50,000 Gold Coin | 3.5% Daily</span></div>
-      <button style="background:#f3c623; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="buyPackage('Gold Plan', 50000)" data-en="Subscribe" data-ur="خریدیں">Subscribe</button>
-    </div>
-
-    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:12px; font-weight:bold; color:#5aa8ff; margin-top:10px; margin-bottom:8px;" data-en="📜 My Transaction History" data-ur="📜 میری ٹرانزیکشن ہسٹری">📜 My Transaction History</div>
-    <div id="userHistoryBox" style="max-height:120px; overflow-y:auto;"></div>
-
-    <button onclick="closeMenuModal()" style="background:none; border:none; color:#ff5b5b; margin-top:12px; cursor:pointer; font-weight:bold; font-size:12px;" data-en="Close Menu ✕" data-ur="بند کریں ✕">Close Menu ✕</button>
-  </div>
+<div class="header-bar">
+  <div id="gameTitleStatus" style="font-weight:bold; color:#f3c623;">Ludo Match Arena</div>
+  <button class="btn-leave" onclick="leaveMatch()" id="btnLeaveText">Leave Game</button>
 </div>
 
-<div class="app">
-  <!-- ================= SCREEN 1: LOGIN ================= -->
-  <div class="screen active" id="loginScreen">
-    <div class="auth-card">
-      <div class="logo-area">
-        <h1>🏆 LUDO STAR</h1>
-        <p data-en="Premium System Gateway" data-ur="پریمیم سسٹم گیٹ وے">Premium System Gateway</p>
-      </div>
-      <div class="input-group">
-        <label id="lblLoginEmail" data-en="Gmail Address / Admin ID" data-ur="جی میل ایڈریس / ایڈمن آئی ڈی">Gmail Address / Admin ID</label>
-        <input type="email" id="loginEmail" placeholder="example@gmail.com">
-      </div>
-      <div class="input-group">
-        <label id="lblLoginPass" data-en="Password" data-ur="پاس ورڈ">Password</label>
-        <input type="password" id="loginPass" placeholder="••••••••">
-      </div>
-      <button class="btn-primary" onclick="handleLogin()" data-en="Sign In" data-ur="لاگ ان کریں">Sign In</button>
-      <div class="switch-text" onclick="switchScreen('registerScreen')" data-en="Create New Account" data-ur="نیا اکاؤنٹ بنائیں">Create New Account</div>
-    </div>
-  </div>
+<!-- Turn Status Panel -->
+<div class="control-box">
+  <div id="turnDisplay" class="p-indicator">Player Turn: Red 🔴</div>
+  <div id="timerDisplay" class="timer-banner" style="background:#ff3333;">Time Left: 10s</div>
+  <br>
+  <div id="diceResult" style="font-size:24px; font-weight:bold; margin:6px 0;">🎲 ?</div>
+  <button class="dice-btn" id="btnRollDice" onclick="rollDice()">Roll Dice</button>
+</div>
 
-  <!-- ================= SCREEN 2: REGISTER ================= -->
-  <div class="screen" id="registerScreen">
-    <div class="auth-card">
-      <div class="logo-area">
-        <h1>🏆 LUDO STAR</h1>
-        <p data-en="Get 5,000 Free Gold Coins on SignUp" data-ur="اکاؤنٹ بنانے پر 5000 کوائنز بالکل مفت حاصل کریں">Get 5,000 Free Gold Coins on SignUp</p>
-      </div>
-      <div class="input-group">
-        <label data-en="Full Name" data-ur="پورا نام">Full Name</label>
-        <input type="text" id="regName" placeholder="Enter Full Name">
-      </div>
-      <div class="input-group">
-        <label data-en="Gmail Address" data-ur="جی میل ایڈریس">Gmail Address</label>
-        <input type="email" id="regEmail" placeholder="name@gmail.com">
-      </div>
-      <div class="input-group">
-        <label data-en="Password" data-ur="پاس ورڈ">Password</label>
-        <input type="password" id="regPass" placeholder="Password">
-      </div>
-      <button class="btn-primary" onclick="handleRegister()" data-en="Register Account" data-ur="رجسٹر کریں">Register Account</button>
-      <div class="switch-text" onclick="switchScreen('loginScreen')" data-en="Back to Login" data-ur="لاگ ان صفحہ پر واپس جائیں">Back to Login</div>
-    </div>
-  </div>
-
-  <!-- ================= SCREEN 3: USER DASHBOARD ================= -->
-  <div class="screen" id="dashboardScreen">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-      <div>
-        <div id="dashName" style="font-size:16px; font-weight:bold; color:#ffea79;">GAMER</div>
-        <div id="dashEmail" style="font-size:11px; opacity:0.5;">gamer@gmail.com</div>
-      </div>
-      <div style="display:flex; align-items:center; gap:6px;">
-        <button class="lang-btn" onclick="toggleLanguage()">🌐 Language</button>
-        <button onclick="openMenuModal()" style="background:linear-gradient(135deg, #f3c623, #ff9800); color:#1c0a30; border:none; padding:7px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer;" data-en="☰ Packages" data-ur="☰ پیکجز">☰ Packages</button>
-        <button onclick="logout()" style="background:none; border:1px solid rgba(255,255,255,0.2); padding:5px 8px; border-radius:8px; color:#ff5b5b; font-size:11px; cursor:pointer;" data-en="Logout" data-ur="لاگ آؤٹ">Logout</button>
-      </div>
-    </div>
-
-    <div class="wallets-container">
-      <div class="wallet-box gold-money">
-        <div class="w-label" data-en="🪙 Gold Coins" data-ur="🪙 گولڈ کوائنز">🪙 Gold Coins</div>
-        <div class="w-val w-gold" id="dashGold">0</div>
-        <button class="daily-btn" onclick="claimDailyBonus()" data-en="🎁 Claim 500" data-ur="🎁 کلیم 500">🎁 Claim 500</button>
-      </div>
-      <div class="wallet-box real-money">
-        <div class="w-label" data-en="💵 Real Cash" data-ur="💵 نقد رقم">💵 Real Cash</div>
-        <div class="w-val w-rs" id="dashRs">Rs 0</div>
-        <div id="depStatusDisplay" style="font-size:10px; color:#26de6e; margin-top:8px;">Status: None</div>
-      </div>
-    </div>
-
-    <div class="input-group" style="background:rgba(0,0,0,0.25); padding:10px; border-radius:12px; margin-bottom:15px;">
-      <label style="color:#f3c623; font-weight:bold;" data-en="Select Table Bet Value:" data-ur="ٹیبل بیٹ منتخب کریں:">Select Table Bet Value:</label>
-      <select id="gameBetSelect">
-        <!-- Dynamic loading of clean language dropdown options -->
-      </select>
-    </div>
-
-    <div style="font-size:14px; font-weight:bold; text-align:left; margin-bottom:5px; color:#ffea79;" data-en="Select Arena Mode:" data-ur="گیم موڈ منتخب کریں:">Select Arena Mode:</div>
-    
-    <div class="modes-grid-4">
-      <div class="mode-card-square border-purple" onclick="realLaunchGame('computer', 2)">
-        <div style="font-size:30px;">🤖</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="Vs Computer (2P)" data-ur="کمپیوٹر (2 کھلاڑی)">Vs Computer (2P)</div>
-      </div>
-      <div class="mode-card-square border-orange" onclick="realLaunchGame('quick', 2)">
-        <div style="font-size:30px;">⚡</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="Quick Game (2P)" data-ur="فوری گیم (2 کھلاڑی)">Quick Game (2P)</div>
-      </div>
-      <div class="mode-card-square border-yellow" onclick="realLaunchGame('practice', 4)">
-        <div style="font-size:30px;">🏆</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="4 Players Mode" data-ur="4 کھلاڑیوں کا موڈ">4 Players Mode</div>
-      </div>
-      <div class="mode-card-square border-green" onclick="realLaunchGame('2player', 2)">
-        <div style="font-size:30px;">👥</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="2 Players Match" data-ur="2 کھلاڑیوں کا میچ">2 Players Match</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SCREEN 4: MASTER ADMIN CONTROL PANEL ================= -->
-  <div class="screen" id="adminScreen">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f3c623; padding-bottom:8px; margin-bottom:15px;">
-      <h2 style="color:#f3c623; font-size:18px;" data-en="🛠️ Admin Network" data-ur="🛠️ ایڈمن کنٹرول پینل">🛠️ Admin Network</h2>
-      <div style="display:flex; gap:6px;">
-        <button class="lang-btn" onclick="toggleLanguage()">🌐 Language</button>
-        <button onclick="logout()" style="background:#ff5b5b; border:none; padding:4px 10px; color:#fff; border-radius:6px; cursor:pointer; font-size:11px;" data-en="Logout" data-ur="لاگ آؤٹ">Logout</button>
-      </div>
-    </div>
-
-    <div class="admin-stats-grid">
-      <div class="stat-box"><h4 data-en="Total Users" data-ur="کل صارفین">Total Users</h4><p id="cntUsers">0</p></div>
-      <div class="stat-box" style="border-color:#1f9d4e;"><h4 data-en="Deposits" data-ur="ڈپوزٹس">Deposits</h4><p id="cntDeps">0</p></div>
-      <div class="stat-box" style="border-color:#ff5b5b;"><h4 data-en="Withdraws" data-ur="ودڈراز">Withdraws</h4><p id="cntWiths">0</p></div>
-    </div>
-
-    <div style="font-size:12px; font-weight:bold; color:#5aa8ff; text-align:left; margin-bottom:4px;" data-en="👥 Registered Users Base" data-ur="👥 رجسٹرڈ صارفین کی لسٹ">👥 Registered Users Base</div>
-    <div style="max-height:140px; overflow-y:auto; background:#0c0314; border-radius:10px; padding:5px; margin-bottom:15px;">
-      <table>
-        <thead><tr><th data-en="User Name" data-ur="صارف کا نام">User Name</th><th data-en="Gold" data-ur="گولڈ">Gold</th><th data-en="Cash Rs" data-ur="کیش رقم">Cash Rs</th></tr></thead>
-        <tbody id="admUsersTable"></tbody>
-      </table>
-    </div>
-
-    <div style="font-size:12px; font-weight:bold; color:#26de6e; text-align:left; margin-bottom:4px;" data-en="📥 Incoming Cash Deposits" data-ur="📥 آنے والے کیش ڈپازٹس">📥 Incoming Cash Deposits</div>
-    <div id="admDepsQueue" style="background:#0c0314; border-radius:10px; padding:6px; font-size:11px; max-height:110px; overflow-y:auto; margin-bottom:15px;"></div>
-
-    <div style="font-size:12px; font-weight:bold; color:#ff5b5b; text-align:left; margin-bottom:4px;" data-en="📤 Outgoing Cash Withdrawals" data-ur="📤 رقم نکالنے کی درخواستیں">📤 Outgoing Cash Withdrawals</div>
-    <div id="admWithsQueue" style="background:#0c0314; border-radius:10px; padding:6px; font-size:11px; max-height:110px; overflow-y:auto;"></div>
+<!-- Mini Ludo Arena Structure -->
+<div style="margin-top:15px;">
+  <div class="ludo-board">
+    <div class="zone red-home" id="z-red"></div>
+    <div class="zone green-home" id="z-green"></div>
+    <div class="zone center-home"></div>
+    <div class="zone blue-home" id="z-blue"></div>
+    <div class="zone yellow-home" id="z-yellow"></div>
   </div>
 </div>
 
 <script>
-  let db = JSON.parse(localStorage.getItem('ludo_db5')) || {
-    "player1@gmail.com": { name: "Zubair Baloch", password: "1234", gold: 8000, rs: 300, depStatus: "None", history: [{t:"Signup Free Pack", a:"+5,000 Coin"}] }
-  };
-  let adminReqs = JSON.parse(localStorage.getItem('ludo_admin_reqs5')) || [];
-  let adminWiths = JSON.parse(localStorage.getItem('ludo_admin_withs5')) || [];
-  let currentSession = localStorage.getItem('ludo_session5') || null;
-  let currentLang = localStorage.getItem('ludo_lang5') || 'en';
+  // Extract configuration parameters dynamically from URL query
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode') || 'practice';
+  const betValue = parseInt(urlParams.get('bet')) || 10;
+  const playersCount = parseInt(urlParams.get('players')) || 2; // Can be exactly 2 or 4
+  const lang = localStorage.getItem('ludo_lang5') || 'en';
 
-  function showToast(msg) {
-    const t = document.getElementById('toast'); t.textContent = msg;
-    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000);
-  }
+  let playersSequence = [];
+  let currentPlayerIdx = 0;
+  let countdownTimer = null;
+  let secondsRemaining = 10;
 
-  function applyLanguage(lang) {
-    currentLang = lang;
-    localStorage.setItem('ludo_lang5', lang);
-    
-    document.querySelectorAll('[data-en]').forEach(el => {
-      el.textContent = el.getAttribute('data-' + lang);
-    });
-
-    // Clean Input Placeholders depending on the active language
-    if(lang === 'en') {
-      document.getElementById('loginEmail').placeholder = "example@gmail.com";
-      document.getElementById('loginPass').placeholder = "••••••••";
-      if(document.getElementById('regName')) {
-        document.getElementById('regName').placeholder = "Enter Full Name";
-        document.getElementById('regEmail').placeholder = "name@gmail.com";
-        document.getElementById('regPass').placeholder = "Password";
-      }
-      document.getElementById('menuDepAmt').placeholder = "Amount (Rs)";
-      document.getElementById('menuDepTx').placeholder = "Transaction ID (TxID)";
-      document.getElementById('withdrawNum').placeholder = "Account Number";
-      document.getElementById('withdrawName').placeholder = "Account Holder Name";
-      document.getElementById('withdrawAmt').placeholder = "Withdraw Amount (Rs)";
+  // Render language perfectly separate
+  function initLanguage() {
+    if(lang === 'ur') {
+      document.getElementById('gameTitleStatus').textContent = "لڈو پلے گراؤنڈ";
+      document.getElementById('btnLeaveText').textContent = "گیم چھوڑیں";
+      document.getElementById('btnRollDice').textContent = "ڈائس گھمائیں";
+      updateTurnTextUr();
     } else {
-      document.getElementById('loginEmail').placeholder = "جی میل ایڈریس لکھیں";
-      document.getElementById('loginPass').placeholder = "پاس ورڈ درج کریں";
-      if(document.getElementById('regName')) {
-        document.getElementById('regName').placeholder = "پورا نام لکھیں";
-        document.getElementById('regEmail').placeholder = "جی میل لکھیں";
-        document.getElementById('regPass').placeholder = "خفیہ پاس ورڈ";
-      }
-      document.getElementById('menuDepAmt').placeholder = "رقم لکھیں (روپے)";
-      document.getElementById('menuDepTx').placeholder = "ٹرانزیکشن آئی ڈی (TxID)";
-      document.getElementById('withdrawNum').placeholder = "موبائل اکاؤنٹ نمبر درج کریں";
-      document.getElementById('withdrawName').placeholder = "اکاؤنٹ ہولڈر کا نام";
-      document.getElementById('withdrawAmt').placeholder = "نکالنے کی رقم لکھیں";
+      document.getElementById('gameTitleStatus').textContent = "Ludo Match Arena";
+      document.getElementById('btnLeaveText').textContent = "Leave Game";
+      document.getElementById('btnRollDice').textContent = "Roll Dice";
+      updateTurnTextEn();
     }
+  }
 
-    // Dropdown Select options clean translation
-    const select = document.getElementById('gameBetSelect');
-    if(select) {
-      select.innerHTML = '';
-      if(lang === 'en') {
-        select.innerHTML += `<option value="10">Table Bet: 10 Rs / 500 Gold Coins</option>`;
-        select.innerHTML += `<option value="50">Table Bet: 50 Rs / 2,000 Gold Coins</option>`;
-        select.innerHTML += `<option value="100">Table Bet: 100 Rs / 5,000 Gold Coins</option>`;
-      } else {
-        select.innerHTML += `<option value="10">ٹیبل بیٹ: 10 روپے / 500 گولڈ کوائنز</option>`;
-        select.innerHTML += `<option value="50">ٹیبل بیٹ: 50 روپے / 2000 گولڈ کوائنز</option>`;
-        select.innerHTML += `<option value="100">ٹیبل بیٹ: 100 روپے / 5000 گولڈ کوائنز</option>`;
-      }
-    }
+  function updateTurnTextEn() {
+    const color = playersSequence[currentPlayerIdx];
+    document.getElementById('turnDisplay').textContent = `Player Turn: ${color.toUpperCase()}`;
+    document.getElementById('timerDisplay').textContent = `Time Left: ${secondsRemaining}s`;
+  }
+
+  function updateTurnTextUr() {
+    let colorName = playersSequence[currentPlayerIdx];
+    if(colorName === 'red') colorName = 'سرخ (Red)';
+    if(colorName === 'green') colorName = 'سبز (Green)';
+    if(colorName === 'yellow') colorName = 'پیلا (Yellow)';
+    if(colorName === 'blue') colorName = 'نیلا (Blue)';
     
-    // Dynamic update details
-    if(currentSession && currentSession !== "ADMIN_ROOM") {
-      const u = db[currentSession];
-      document.getElementById('depStatusDisplay').textContent = (lang === 'en' ? "Status: " : "اسٹیٹس: ") + (u.depStatus || "None");
+    document.getElementById('turnDisplay').textContent = `باری: ${colorName}`;
+    document.getElementById('timerDisplay').textContent = `باقی وقت: ${secondsRemaining} سیکنڈ`;
+  }
+
+  // Setup strict active headcount sequence
+  function setupArena() {
+    if(playersCount === 2) {
+      playersSequence = ['red', 'green']; // Strictly two entities
+      document.getElementById('z-red').innerHTML = '<div class="token t-red"></div><div class="token t-red"></div>';
+      document.getElementById('z-green').innerHTML = '<div class="token t-green"></div><div class="token t-green"></div>';
+      document.getElementById('z-yellow').style.opacity = "0.2";
+      document.getElementById('z-blue').style.opacity = "0.2";
+    } else {
+      playersSequence = ['red', 'green', 'yellow', 'blue']; // Full four entities setup
+      document.getElementById('z-red').innerHTML = '<div class="token t-red"></div><div class="token t-red"></div>';
+      document.getElementById('z-green').innerHTML = '<div class="token t-green"></div><div class="token t-green"></div>';
+      document.getElementById('z-yellow').innerHTML = '<div class="token t-yellow"></div><div class="token t-yellow"></div>';
+      document.getElementById('z-blue').innerHTML = '<div class="token t-blue"></div><div class="token t-blue"></div>';
     }
-    calcMenuFee();
+    startTurnTimer();
   }
 
-  function toggleLanguage() {
-    let target = currentLang === 'en' ? 'ur' : 'en';
-    applyLanguage(target);
-    showToast(target === 'en' ? "Language changed to English!" : "زبان تبدیل ہو کر اردو ہو گئی ہے!");
+  function startTurnTimer() {
+    clearInterval(countdownTimer);
+    secondsRemaining = 10; // Exactly 10 seconds auto turn limit
+    if(lang === 'en') { updateTurnTextEn(); } else { updateTurnTextUr(); }
+
+    countdownTimer = setInterval(() => {
+      secondsRemaining--;
+      if(lang === 'en') { updateTurnTextEn(); } else { updateTurnTextUr(); }
+
+      if(secondsRemaining <= 0) {
+        clearInterval(countdownTimer);
+        autoPassTurn(); // Pass token turn immediately
+      }
+    }, 1000);
   }
 
-  function switchScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    applyLanguage(currentLang);
+  function autoPassTurn() {
+    currentPlayerIdx = (currentPlayerIdx + 1) % playersSequence.length;
+    startTurnTimer();
   }
 
-  function handleRegister() {
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim().toLowerCase();
-    const pass = document.getElementById('regPass').value.trim();
-    if(!name || !email || !pass) return showToast(currentLang === 'en' ? 'Please fill all fields!' : 'تمام خانے پُر کریں!');
-
-    db[email] = { name: name, password: pass, gold: 5000, rs: 0, depStatus: "None", history: [{t:"Welcome Bonus Claimed", a:"+5,000 Gold"}] };
-    saveAll();
-    showToast(currentLang === 'en' ? 'Registration complete! Login now.' : 'رجسٹریشن مکمل ہو گئی! لاگ ان کریں۔');
-    switchScreen('loginScreen');
-  }
-
-  function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-    const pass = document.getElementById('loginPass').value.trim();
-
-    if(email === "bakhtyarmarri2@gmail.com" && pass === "Marri@123") {
-      currentSession = "ADMIN_ROOM";
-      localStorage.setItem('ludo_session5', "ADMIN_ROOM");
-      loadAdminPanel();
-      return;
-    }
-
-    if(!db[email] || db[email].password !== pass) return showToast(currentLang === 'en' ? 'Invalid details!' : 'غلط معلومات!');
-
-    currentSession = email;
-    localStorage.setItem('ludo_session5', email);
-    loadDashboard();
-  }
-
-  function loadDashboard() {
-    if(!currentSession || currentSession === "ADMIN_ROOM") return;
-    const user = db[currentSession];
-    document.getElementById('dashName').textContent = user.name.toUpperCase();
-    document.getElementById('dashEmail').textContent = currentSession;
-    document.getElementById('dashGold').textContent = user.gold.toLocaleString();
-    document.getElementById('dashRs').textContent = "Rs " + user.rs.toLocaleString();
+  function rollDice() {
+    const val = Math.floor(Math.random() * 6) + 1;
+    const icons = ["🎲 1", "🎲 2", "🎲 3", "🎲 4", "🎲 5", "🎲 6"];
+    document.getElementById('diceResult').textContent = icons[val - 1];
     
-    const hBox = document.getElementById('userHistoryBox');
-    hBox.innerHTML = '';
-    if(user.history) {
-      user.history.slice().reverse().forEach(h => {
-        hBox.innerHTML += `<div class="hist-item"><strong>${h.t}:</strong> <span style="color:#26de6e; float:right;">${h.a}</span></div>`;
-      });
-    }
-    switchScreen('dashboardScreen');
+    // Move to next player turn configuration
+    currentPlayerIdx = (currentPlayerIdx + 1) % playersSequence.length;
+    startTurnTimer();
   }
 
-  function openMenuModal() { document.getElementById('menuModal').classList.add('open'); }
-  function closeMenuModal() { document.getElementById('menuModal').classList.remove('open'); }
-
-  function calcMenuFee() {
-    const amt = parseFloat(document.getElementById('menuDepAmt').value) || 0;
-    const net = amt - (amt * 0.03);
-    const notice = document.getElementById('menuFeeNotice');
-    if(notice) {
-      notice.textContent = currentLang === 'en' ? `Net Amount: Rs ${net.toFixed(1)}` : `نیٹ رقم: Rs ${net.toFixed(1)}`;
-    }
+  function leaveMatch() {
+    clearInterval(countdownTimer);
+    alert(lang === 'en' ? "You left the match! Match losses applied." : "آپ نے میچ چھوڑ دیا! رقم منہا کر دی گئی ہے۔");
+    window.location.href = 'index.html'; // Safe fallback redirect back to core panel
   }
-
-  function submitMenuDeposit() {
-    const amt = parseFloat(document.getElementById('menuDepAmt').value);
-    const tx = document.getElementById('menuDepTx').value.trim();
-    if(!amt || amt <= 0 || !tx) return showToast(currentLang === 'en' ? 'Enter valid amount & TxID!' : 'درست رقم اور ٹرانزیکشن آئی ڈی لکھیں!');
-
-    const netAmount = amt - (amt * 0.03);
-    adminReqs.push({ id: Date.now(), user: currentSession, raw: amt, net: netAmount, txid: tx });
-    localStorage.setItem('ludo_admin_reqs5', JSON.stringify(adminReqs));
-
-    db[currentSession].depStatus = "Pending";
-    db[currentSession].history.push({t: "Deposit Requested", a: `Rs ${amt}`});
-    saveAll();
-    loadDashboard();
-    closeMenuModal();
-    showToast(currentLang === 'en' ? 'Deposit request submitted!' : 'ڈپوزٹ ریکویسٹ بھیج دی گئی ہے!');
-  }
-
-  function submitMenuWithdraw() {
-    const method = document.getElementById('withdrawMethod').value;
-    const num = document.getElementById('withdrawNum').value.trim();
-    const name = document.getElementById('withdrawName').value.trim();
-    const amt = parseFloat(document.getElementById('withdrawAmt').value);
-
-    if(!num || !name || !amt || amt <= 0) return showToast(currentLang === 'en' ? 'Fill details!' : 'معلومات پُر کریں!');
-    if(db[currentSession].rs < amt) return showToast(currentLang === 'en' ? 'Insufficient Balance!' : 'رقم کم ہے!');
-
-    db[currentSession].rs -= amt;
-    adminWiths.push({ id: Date.now(), user: currentSession, method: method.toUpperCase(), accountNum: num, accountName: name, amt: amt });
-    localStorage.setItem('ludo_admin_withs5', JSON.stringify(adminWiths));
-
-    db[currentSession].history.push({t: `Withdraw Pending (${method.toUpperCase()})`, a: `-Rs ${amt}`});
-    saveAll();
-    loadDashboard();
-    closeMenuModal();
-    showToast(currentLang === 'en' ? 'Request sent!' : 'درخواست بھیج دی گئی ہے!');
-  }
-
-  function buyPackage(pName, cost) {
-    const user = db[currentSession];
-    if(user.gold < cost) return showToast(currentLang === 'en' ? 'Not enough gold!' : 'کوائنز کم ہیں!');
-    user.gold -= cost;
-    user.history.push({t: `Subscribed ${pName}`, a: `-${cost} Gold`});
-    saveAll();
-    loadDashboard();
-    closeMenuModal();
-    showToast(currentLang === 'en' ? `Subscribed to ${pName}!` : 'پیکج ایکٹیو ہو گیا ہے!');
-  }
-
-  function claimDailyBonus() {
-    db[currentSession].gold += 500;
-    db[currentSession].history.push({t: "Daily Bonus Pack", a: "+500 Gold"});
-    saveAll();
-    loadDashboard();
-    showToast('+500 Gold Claimed!');
-  }
-
-  function realLaunchGame(mode, playersCount) {
-    const bet = parseInt(document.getElementById('gameBetSelect').value);
-    // Explicit redirection sending mode, bet and strict headcount configuration
-    window.location.href = `game.html?mode=${mode}&bet=${bet}&players=${playersCount}`;
-  }
-
-  function loadAdminPanel() {
-    const usersKeys = Object.keys(db);
-    document.getElementById('cntUsers').textContent = usersKeys.length;
-    document.getElementById('cntDeps').textContent = adminReqs.length;
-    document.getElementById('cntWiths').textContent = adminWiths.length;
-
-    const utable = document.getElementById('admUsersTable');
-    utable.innerHTML = '';
-    usersKeys.forEach(k => {
-      const u = db[k];
-      utable.innerHTML += `<tr><td><strong>${u.name}</strong><br><span style="font-size:9px;">${k}</span></td><td>${u.gold}</td><td style="color:#26de6e;">Rs ${u.rs}</td></tr>`;
-    });
-
-    const dBox = document.getElementById('admDepsQueue');
-    dBox.innerHTML = '';
-    adminReqs.forEach(r => {
-      dBox.innerHTML += `<div style="padding:5px; margin-bottom:5px; border-bottom:1px solid #333;">User: ${r.user} | Rs ${r.net} <button onclick="approveDep(${r.id})" style="background:green;color:#fff;border:none;padding:2px 5px;">Approve</button></div>`;
-    });
-
-    const wBox = document.getElementById('admWithsQueue');
-    wBox.innerHTML = '';
-    adminWiths.forEach(w => {
-      wBox.innerHTML += `<div style="padding:5px; margin-bottom:5px; border-bottom:1px solid #333;">${w.user} | ${w.method} Rs ${w.amt} <button onclick="approveWith(${w.id})" style="background:red;color:#fff;border:none;padding:2px 5px;">Clear</button></div>`;
-    });
-    switchScreen('adminScreen');
-  }
-
-  function approveDep(id) {
-    const idx = adminReqs.findIndex(r => r.id === id);
-    if(idx === -1) return;
-    const r = adminReqs[idx];
-    if(db[r.user]) {
-      db[r.user].rs += r.net;
-      db[r.user].depStatus = "Approved";
-      db[r.user].history.push({t: "Deposit Approved", a: `+Rs ${r.net}`});
-    }
-    adminReqs.splice(idx, 1);
-    localStorage.setItem('ludo_admin_reqs5', JSON.stringify(adminReqs));
-    saveAll(); loadAdminPanel();
-  }
-
-  function approveWith(id) {
-    const idx = adminWiths.findIndex(w => w.id === id);
-    if(idx === -1) return;
-    const w = adminWiths[idx];
-    if(db[w.user]) {
-      db[w.user].history.push({t: `Withdraw Cleared`, a: `Paid Rs ${w.amt}`});
-    }
-    adminWiths.splice(idx, 1);
-    localStorage.setItem('ludo_admin_withs5', JSON.stringify(adminWiths));
-    saveAll(); loadAdminPanel();
-  }
-
-  function saveAll() { localStorage.setItem('ludo_db5', JSON.stringify(db)); }
-  function logout() { localStorage.removeItem('ludo_session5'); currentSession = null; switchScreen('loginScreen'); }
 
   window.onload = function() {
-    applyLanguage(currentLang);
-    if(currentSession === "ADMIN_ROOM") { loadAdminPanel(); }
-    else if(currentSession && db[currentSession]) { loadDashboard(); }
-    else { switchScreen('loginScreen'); }
+    initLanguage();
+    setupArena();
   };
 </script>
 </body>
