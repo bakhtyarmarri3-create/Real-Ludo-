@@ -100,231 +100,243 @@
     padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: bold; opacity: 0; z-index: 300; transition: 0.3s;
   }
   .toast.show { opacity: 1; }
+
+  .lang-btn {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;
+  }
 </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
 
-<!-- ================= ☰ MAIN MENU MODAL (PACKAGES, WALLET & HISTORY) ================= -->
 <div class="modal-overlay" id="menuModal">
   <div class="custom-modal">
-    <h3 style="color:#f3c623; margin-bottom:12px;">🏆 Premium Account Room</h3>
+    <h3 style="color:#f3c623; margin-bottom:12px;" data-en="🏆 Premium Account Room" data-ur="🏆 پریمیم اکاؤنٹ روم">🏆 Premium Account Room</h3>
     
     <div style="background:rgba(31, 157, 78, 0.15); border:1px solid #1f9d4e; border-radius:12px; padding:8px; text-align:left; margin-bottom:12px; font-size:12px;">
-      <span style="color:#26de6e; font-weight:bold;">🟢 EasyPaisa No: 03431289824</span>
+      <span style="color:#26de6e; font-weight:bold;">🟢 EasyPaisa / JazzCash Till: 03431289824</span>
     </div>
 
-    <!-- Deposit Inputs -->
+    <div style="text-align:left; font-size:11px; margin-bottom:4px; font-weight:bold; color:#26de6e;" data-en="👉 Deposit Section:" data-ur="👉 رقم جمع کرنے کا طریقہ:">👉 Deposit Section:</div>
     <input type="number" id="menuDepAmt" placeholder="Amount (Rs)" style="margin-bottom:6px;" oninput="calcMenuFee()">
-    <div id="menuFeeNotice" style="font-size:11px; text-align:right; color:#26de6e; margin-bottom:6px;">نیٹ رقم: Rs 0</div>
+    <div id="menuFeeNotice" style="font-size:11px; text-align:right; color:#26de6e; margin-bottom:6px;" data-en="Net Amount: Rs 0" data-ur="نیٹ رقم: Rs 0">Net Amount: Rs 0</div>
     <input type="text" id="menuDepTx" placeholder="Transaction ID (TxID)" style="margin-bottom:10px;">
-    
-    <div style="display:flex; gap:10px; margin-bottom:15px;">
-      <button class="btn-primary" onclick="submitMenuDeposit()" style="background:#1f9d4e; color:#fff; padding:10px; margin:0;">➕ Deposit</button>
-      <button class="btn-primary" onclick="submitMenuWithdraw()" style="background:#d32f2f; color:#fff; padding:10px; margin:0;">➖ Withdraw</button>
-    </div>
+    <button class="btn-primary" onclick="submitMenuDeposit()" style="background:#1f9d4e; color:#fff; padding:10px; margin-bottom:15px;" data-en="➕ Submit Deposit" data-ur="➕ ڈپازٹ ریکویسٹ بھیجیں">➕ Submit Deposit</button>
 
-    <!-- Mining Packages Section -->
-    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:12px; font-weight:bold; color:#f3c623; margin-bottom:8px;">
-      Premium Mining Packages
-    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:11px; margin-bottom:6px; font-weight:bold; color:#ff5b5b;" data-en="👉 Withdraw Section:" data-ur="👉 رقم نکالنے کا طریقہ:">👉 Withdraw Section:</div>
+    
+    <select id="withdrawMethod" style="margin-bottom:6px;" onchange="toggleWithdrawFields()">
+      <option value="easypaisa" data-en="EasyPaisa Mobile Account" data-ur="ایزی پیسہ موبائل اکاؤنٹ">EasyPaisa Mobile Account</option>
+      <option value="jazzcash" data-en="JazzCash Mobile Account" data-ur="جاز کیش موبائل اکاؤنٹ">JazzCash Mobile Account</option>
+    </select>
+    <input type="text" id="withdrawNum" placeholder="Account Number (e.g. 03001234567)" style="margin-bottom:6px;">
+    <input type="text" id="withdrawName" placeholder="Account Holder Name" style="margin-bottom:6px;">
+    <input type="number" id="withdrawAmt" placeholder="Withdraw Amount (Rs)" style="margin-bottom:10px;">
+    
+    <button class="btn-primary" onclick="submitMenuWithdraw()" style="background:#d32f2f; color:#fff; padding:10px; margin-bottom:15px;" data-en="➖ Submit Withdraw Request" data-ur="➖ ودڈر ریکویسٹ بھیجیں">➖ Submit Withdraw Request</button>
+
+    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:12px; font-weight:bold; color:#f3c623; margin-bottom:8px;" data-en="Premium Mining Packages" data-ur="پریمیم مائننگ پیکجز">Premium Mining Packages</div>
     <div class="modal-pkg-card">
       <div><strong>🥈 Silver Plan</strong><br><span style="font-size:10px; opacity:0.6;">10,000 Gold Coin | 2% Daily</span></div>
-      <button style="background:#f3c623; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="buyPackage('Silver Plan', 10000)">Subscribe</button>
+      <button style="background:#f3c623; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="buyPackage('Silver Plan', 10000)" data-en="Subscribe" data-ur="خریدیں">Subscribe</button>
     </div>
     <div class="modal-pkg-card">
       <div><strong>🥇 Gold Plan</strong><br><span style="font-size:10px; opacity:0.6;">50,000 Gold Coin | 3.5% Daily</span></div>
-      <button style="background:#f3c623; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="buyPackage('Gold Plan', 50000)">Subscribe</button>
+      <button style="background:#f3c623; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="buyPackage('Gold Plan', 50000)" data-en="Subscribe" data-ur="خریدیں">Subscribe</button>
     </div>
 
-    <!-- Personal Statement History Inside Modal -->
-    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:12px; font-weight:bold; color:#5aa8ff; margin-top:10px; margin-bottom:8px;">
-      📜 My Transaction History
-    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:left; font-size:12px; font-weight:bold; color:#5aa8ff; margin-top:10px; margin-bottom:8px;" data-en="📜 My Transaction History" data-ur="📜 میری ٹرانزیکشن ہسٹری">📜 My Transaction History</div>
     <div id="userHistoryBox" style="max-height:120px; overflow-y:auto;"></div>
 
-    <button onclick="closeMenuModal()" style="background:none; border:none; color:#ff5b5b; margin-top:12px; cursor:pointer; font-weight:bold; font-size:12px;">Close Menu ✕</button>
+    <button onclick="closeMenuModal()" style="background:none; border:none; color:#ff5b5b; margin-top:12px; cursor:pointer; font-weight:bold; font-size:12px;" data-en="Close Menu ✕" data-ur="بند کریں ✕">Close Menu ✕</button>
   </div>
 </div>
 
-<!-- ================= USER DETAILS MODAL (FOR ADMIN VIEW) ================= -->
 <div class="modal-overlay" id="userDetailsModal">
   <div class="custom-modal">
     <h3 style="color:#f3c623;" id="detUserTitle">User Ledger</h3>
     <p id="detUserEmail" style="font-size:11px; opacity:0.6; margin-bottom:15px;"></p>
-    
-    <div style="text-align:left; font-size:13px; font-weight:bold; color:#ffea79; margin-bottom:6px;">Full Account Logs:</div>
+    <div style="text-align:left; font-size:13px; font-weight:bold; color:#ffea79; margin-bottom:6px;" data-en="Full Account Logs:" data-ur="اکاؤنٹ کی مکمل ہسٹری:">Full Account Logs:</div>
     <div id="adminUserHistoryBox" style="max-height:200px; overflow-y:auto; margin-bottom:15px;"></div>
-    
-    <button onclick="document.getElementById('userDetailsModal').classList.remove('open')" class="btn-primary" style="background:#ff5b5b; color:#fff;">Close Details</button>
+    <button onclick="document.getElementById('userDetailsModal').classList.remove('open')" class="btn-primary" style="background:#ff5b5b; color:#fff;" data-en="Close Details" data-ur="بند کریں">Close Details</button>
   </div>
 </div>
 
 
 <div class="app">
 
-  <!-- ================= SCREEN 1: LOGIN ================= -->
   <div class="screen active" id="loginScreen">
     <div class="auth-card">
       <div class="logo-area">
         <h1>🏆 LUDO STAR</h1>
-        <p>Premium System Gateway</p>
+        <p data-en="Premium System Gateway" data-ur="پریمیم سسٹم گیٹ وے">Premium System Gateway</p>
       </div>
       <div class="input-group">
-        <label>Gmail Address / Admin ID</label>
+        <label data-en="Gmail Address / Admin ID" data-ur="جی میل ایڈریس / ایڈمن آئی ڈی">Gmail Address / Admin ID</label>
         <input type="email" id="loginEmail" placeholder="example@gmail.com">
       </div>
       <div class="input-group">
-        <label>Password</label>
+        <label data-en="Password" data-ur="پاس ورڈ">Password</label>
         <input type="password" id="loginPass" placeholder="••••••••">
       </div>
-      <button class="btn-primary" onclick="handleLogin()">Sign In</button>
-      <div class="switch-text" onclick="switchScreen('registerScreen')">Create New Account</div>
+      <button class="btn-primary" onclick="handleLogin()" data-en="Sign In" data-ur="لاگ ان کریں">Sign In</button>
+      <div class="switch-text" onclick="switchScreen('registerScreen')" data-en="Create New Account" data-ur="نیا اکاؤنٹ بنائیں">Create New Account</div>
     </div>
   </div>
 
-  <!-- ================= SCREEN 2: REGISTER ================= -->
   <div class="screen" id="registerScreen">
     <div class="auth-card">
       <div class="logo-area">
         <h1>🏆 LUDO STAR</h1>
-        <p>Get 5,000 Free Gold Coins on SignUp</p>
+        <p data-en="Get 5,000 Free Gold Coins on SignUp" data-ur="اکاؤنٹ بنانے پر 5000 کوائنز بالکل مفت حاصل کریں">Get 5,000 Free Gold Coins on SignUp</p>
       </div>
       <div class="input-group">
-        <label>Full Name</label>
+        <label data-en="Full Name" data-ur="پورا نام">Full Name</label>
         <input type="text" id="regName" placeholder="Enter Full Name">
       </div>
       <div class="input-group">
-        <label>Gmail Address</label>
+        <label data-en="Gmail Address" data-ur="جی میل ایڈریس">Gmail Address</label>
         <input type="email" id="regEmail" placeholder="name@gmail.com">
       </div>
       <div class="input-group">
-        <label>Password</label>
+        <label data-en="Password" data-ur="پاس ورڈ">Password</label>
         <input type="password" id="regPass" placeholder="Password">
       </div>
-      <button class="btn-primary" onclick="handleRegister()">Register Account</button>
-      <div class="switch-text" onclick="switchScreen('loginScreen')">Back to Login</div>
+      <button class="btn-primary" onclick="handleRegister()" data-en="Register Account" data-ur="رجسٹر کریں">Register Account</button>
+      <div class="switch-text" onclick="switchScreen('loginScreen')" data-en="Back to Login" data-ur="لاگ ان صفحہ پر واپس جائیں">Back to Login</div>
     </div>
   </div>
 
-  <!-- ================= SCREEN 3: USER DASHBOARD ================= -->
   <div class="screen" id="dashboardScreen">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
       <div>
         <div id="dashName" style="font-size:16px; font-weight:bold; color:#ffea79;">GAMER</div>
         <div id="dashEmail" style="font-size:11px; opacity:0.5;">gamer@gmail.com</div>
       </div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <button onclick="openMenuModal()" style="background:linear-gradient(135deg, #f3c623, #ff9800); color:#1c0a30; border:none; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer;">☰ Packages</button>
-        <button onclick="logout()" style="background:none; border:1px solid rgba(255,255,255,0.2); padding:5px 8px; border-radius:8px; color:#ff5b5b; font-size:11px; cursor:pointer;">Logout</button>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button class="lang-btn" onclick="toggleLanguage()">🌐 Language</button>
+        <button onclick="openMenuModal()" style="background:linear-gradient(135deg, #f3c623, #ff9800); color:#1c0a30; border:none; padding:7px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer;">☰ Packages</button>
+        <button onclick="logout()" style="background:none; border:1px solid rgba(255,255,255,0.2); padding:5px 8px; border-radius:8px; color:#ff5b5b; font-size:11px; cursor:pointer;" data-en="Logout" data-ur="لاگ آؤٹ">Logout</button>
       </div>
     </div>
 
     <div class="wallets-container">
       <div class="wallet-box gold-money">
-        <div class="w-label">🪙 Gold Coins</div>
+        <div class="w-label" data-en="🪙 Gold Coins" data-ur="🪙 گولڈ کوائنز">🪙 Gold Coins</div>
         <div class="w-val w-gold" id="dashGold">0</div>
-        <button class="daily-btn" onclick="claimDailyBonus()">🎁 Claim 500</button>
+        <button class="daily-btn" onclick="claimDailyBonus()" data-en="🎁 Claim 500" data-ur="🎁 کلیم 500">🎁 Claim 500</button>
       </div>
       <div class="wallet-box real-money">
-        <div class="w-label">💵 Real Cash</div>
+        <div class="w-label" data-en="💵 Real Cash" data-ur="💵 نقد رقم">💵 Real Cash</div>
         <div class="w-val w-rs" id="dashRs">Rs 0</div>
         <div id="depStatusDisplay" style="font-size:10px; color:#26de6e; margin-top:8px;">Status: None</div>
       </div>
     </div>
 
     <div class="input-group" style="background:rgba(0,0,0,0.25); padding:10px; border-radius:12px; margin-bottom:15px;">
-      <label style="color:#f3c623; font-weight:bold;">Select Table Bet Value:</label>
+      <label style="color:#f3c623; font-weight:bold;" data-en="Select Table Bet Value:" data-ur="ٹیبل بیٹ منتخب کریں:">Select Table Bet Value:</label>
       <select id="gameBetSelect">
-        <option value="10">Table Bet: 10 Rs / 500 Gold 🪙</option>
-        <option value="50">Table Bet: 50 Rs / 2,000 Gold 🪙</option>
-        <option value="100">Table Bet: 100 Rs / 5,000 Gold 🪙</option>
+        <option value="10" data-en="Table Bet: 10 Rs / 500 Gold 🪙" data-ur="ٹیبل بیٹ: 10 روپے / 500 کوائنز 🪙">Table Bet: 10 Rs / 500 Gold 🪙</option>
+        <option value="50" data-en="Table Bet: 50 Rs / 2,000 Gold 🪙" data-ur="ٹیبل بیٹ: 50 روپے / 2000 کوائنز 🪙">Table Bet: 50 Rs / 2,000 Gold 🪙</option>
+        <option value="100" data-en="Table Bet: 100 Rs / 5,000 Gold 🪙" data-ur="ٹیبل بیٹ: 100 روپے / 5000 کوائنز 🪙">Table Bet: 100 Rs / 5,000 Gold 🪙</option>
       </select>
     </div>
 
-    <div style="font-size:14px; font-weight:bold; text-align:left; margin-bottom:5px; color:#ffea79;">Select Arena Mode:</div>
+    <div style="font-size:14px; font-weight:bold; text-align:left; margin-bottom:5px; color:#ffea79;" data-en="Select Arena Mode:" data-ur="گیم موڈ منتخب کریں:">Select Arena Mode:</div>
     
-    <!-- FIX: Redirects directly to real game page without altering balance here -->
     <div class="modes-grid-4">
       <div class="mode-card-square border-purple" onclick="realLaunchGame('computer')">
-        <div style="font-size:30px;">🤖</div><div style="font-weight:700; font-size:13px; margin-top:4px;">Vs Computer</div>
+        <div style="font-size:30px;">🤖</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="Vs Computer" data-ur="کمپیوٹر کے خلاف">Vs Computer</div>
       </div>
       <div class="mode-card-square border-orange" onclick="realLaunchGame('quick')">
-        <div style="font-size:30px;">⚡</div><div style="font-weight:700; font-size:13px; margin-top:4px;">Quick Game</div>
+        <div style="font-size:30px;">⚡</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="Quick Game" data-ur="فوری گیم">Quick Game</div>
       </div>
       <div class="mode-card-square border-yellow" onclick="realLaunchGame('practice')">
-        <div style="font-size:30px;">🏆</div><div style="font-weight:700; font-size:13px; margin-top:4px;">Practice Match</div>
+        <div style="font-size:30px;">🏆</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="Practice Match" data-ur="پریکٹس میچ">Practice Match</div>
       </div>
       <div class="mode-card-square border-green" onclick="realLaunchGame('2player')">
-        <div style="font-size:30px;">👥</div><div style="font-weight:700; font-size:13px; margin-top:4px;">2 Players Game</div>
+        <div style="font-size:30px;">👥</div><div style="font-weight:700; font-size:13px; margin-top:4px;" data-en="2 Players Game" data-ur="2 کھلاڑیوں کی گیم">2 Players Game</div>
       </div>
     </div>
   </div>
 
-  <!-- ================= SCREEN 4: MASTER ADMIN CONTROL PANEL ================= -->
   <div class="screen" id="adminScreen">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f3c623; padding-bottom:8px; margin-bottom:15px;">
-      <h2 style="color:#f3c623; font-size:18px;">🛠️ Admin Network</h2>
-      <button onclick="logout()" style="background:#ff5b5b; border:none; padding:4px 10px; color:#fff; border-radius:6px; cursor:pointer; font-size:11px;">Logout</button>
+      <h2 style="color:#f3c623; font-size:18px;" data-en="🛠️ Admin Network" data-ur="🛠️ ایڈمن کنٹرول پینل">🛠️ Admin Network</h2>
+      <div style="display:flex; gap:6px;">
+        <button class="lang-btn" onclick="toggleLanguage()">🌐 Language</button>
+        <button onclick="logout()" style="background:#ff5b5b; border:none; padding:4px 10px; color:#fff; border-radius:6px; cursor:pointer; font-size:11px;" data-en="Logout" data-ur="لاگ آؤٹ">Logout</button>
+      </div>
     </div>
 
-    <!-- EXPLICIT OUTSTANDING COUNTERS -->
     <div class="admin-stats-grid">
-      <div class="stat-box"><h4>Total Users</h4><p id="cntUsers">0</p></div>
-      <div class="stat-box" style="border-color:#1f9d4e;"><h4>Deposits</h4><p id="cntDeps">0</p></div>
-      <div class="stat-box" style="border-color:#ff5b5b;"><h4>Withdraws</h4><p id="cntWiths">0</p></div>
+      <div class="stat-box"><h4 data-en="Total Users" data-ur="کل صارفین">Total Users</h4><p id="cntUsers">0</p></div>
+      <div class="stat-box" style="border-color:#1f9d4e;"><h4 data-en="Deposits" data-ur="ڈپوزٹس">Deposits</h4><p id="cntDeps">0</p></div>
+      <div class="stat-box" style="border-color:#ff5b5b;"><h4 data-en="Withdraws" data-ur="ودڈراز">Withdraws</h4><p id="cntWiths">0</p></div>
     </div>
 
-    <!-- Live Registered Users Base -->
-    <div style="font-size:12px; font-weight:bold; color:#5aa8ff; text-align:left; margin-bottom:4px;">👥 Registered Users (Click Name to View Logs)</div>
+    <div style="font-size:12px; font-weight:bold; color:#5aa8ff; text-align:left; margin-bottom:4px;" data-en="👥 Registered Users Base" data-ur="👥 رجسٹرڈ صارفین کی لسٹ">👥 Registered Users Base</div>
     <div style="max-height:140px; overflow-y:auto; background:#0c0314; border-radius:10px; padding:5px; margin-bottom:15px;">
       <table>
-        <thead><tr><th>User Name</th><th>Gold</th><th>Cash Rs</th></tr></thead>
+        <thead><tr><th data-en="User Name" data-ur="صارف کا نام">User Name</th><th data-en="Gold" data-ur="گولڈ">Gold</th><th data-en="Cash Rs" data-ur="کیش رقم">Cash Rs</th></tr></thead>
         <tbody id="admUsersTable"></tbody>
       </table>
     </div>
 
-    <!-- Deposit Requests Tab -->
-    <div style="font-size:12px; font-weight:bold; color:#26de6e; text-align:left; margin-bottom:4px;">📥 Incoming Cash Deposits</div>
+    <div style="font-size:12px; font-weight:bold; color:#26de6e; text-align:left; margin-bottom:4px;" data-en="📥 Incoming Cash Deposits" data-ur="📥 آنے والے کیش ڈپازٹس">📥 Incoming Cash Deposits</div>
     <div id="admDepsQueue" style="background:#0c0314; border-radius:10px; padding:6px; font-size:11px; max-height:110px; overflow-y:auto; margin-bottom:15px;"></div>
 
-    <!-- Withdraw Requests Tab -->
-    <div style="font-size:12px; font-weight:bold; color:#ff5b5b; text-align:left; margin-bottom:4px;">📤 Outgoing Cash Withdrawals</div>
+    <div style="font-size:12px; font-weight:bold; color:#ff5b5b; text-align:left; margin-bottom:4px;" data-en="📤 Outgoing Cash Withdrawals" data-ur="📤 رقم نکالنے کی درخواستیں">📤 Outgoing Cash Withdrawals</div>
     <div id="admWithsQueue" style="background:#0c0314; border-radius:10px; padding:6px; font-size:11px; max-height:110px; overflow-y:auto;"></div>
   </div>
 
 </div>
 
 <script>
-  // Robust LocalStorage Real-Time Core Engine
-  let db = JSON.parse(localStorage.getItem('ludo_db4')) || {
+  let db = JSON.parse(localStorage.getItem('ludo_db5')) || {
     "player1@gmail.com": { name: "Zubair Baloch", password: "1234", gold: 8000, rs: 300, depStatus: "None", history: [{t:"Signup Free Pack", a:"+5,000 Coin"}] }
   };
-  let adminReqs = JSON.parse(localStorage.getItem('ludo_admin_reqs4')) || [];
-  let adminWiths = JSON.parse(localStorage.getItem('ludo_admin_withs4')) || [];
-  let currentSession = localStorage.getItem('ludo_session4') || null;
+  let adminReqs = JSON.parse(localStorage.getItem('ludo_admin_reqs5')) || [];
+  let adminWiths = JSON.parse(localStorage.getItem('ludo_admin_withs5')) || [];
+  let currentSession = localStorage.getItem('ludo_session5') || null;
+  let currentLang = localStorage.getItem('ludo_lang5') || 'en'; // default English
 
   function showToast(msg) {
     const t = document.getElementById('toast'); t.textContent = msg;
     t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000);
   }
 
+  function applyLanguage(lang) {
+    document.querySelectorAll('[data-en]').forEach(el => {
+      el.textContent = el.getAttribute('data-' + lang);
+    });
+  }
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'ur' : 'en';
+    localStorage.setItem('ludo_lang5', currentLang);
+    applyLanguage(currentLang);
+    showToast(currentLang === 'en' ? "Language changed to English!" : "زبان تبدیل ہو کر اردو ہو گئی ہے!");
+  }
+
   function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    applyLanguage(currentLang);
   }
 
   function handleRegister() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim().toLowerCase();
     const pass = document.getElementById('regPass').value.trim();
-    if(!name || !email || !pass) return showToast('تمام خانے پُر کریں!');
-    if(db[email] || email === "bakhtyarmarri2@gmail.com") return showToast('یہ آئی ڈی پہلے سے موجود ہے!');
+    if(!name || !email || !pass) return showToast('Please fill all fields! / تمام خانے پُر کریں!');
+    if(db[email] || email === "bakhtyarmarri2@gmail.com") return showToast('ID already exists!');
 
-    db[email] = { name: name, password: pass, gold: 5000, rs: 0, depStatus: "None", history: [{t:"Welcome Bonus Claimed", a:"+5,000 Gold Coins"}] };
+    db[email] = { name: name, password: pass, gold: 5000, rs: 0, depStatus: "None", history: [{t:"Welcome Bonus Claimed", a:"+5,000 Gold"}] };
     saveAll();
-    showToast('اکاؤنٹ بن گیا! لاگ ان کریں ✨');
+    showToast('Registration complete! Login now.');
     switchScreen('loginScreen');
   }
 
@@ -334,17 +346,17 @@
 
     if(email === "bakhtyarmarri2@gmail.com" && pass === "Marri@123") {
       currentSession = "ADMIN_ROOM";
-      localStorage.setItem('ludo_session4', "ADMIN_ROOM");
-      showToast('خوش آمدید ماسٹر ایڈمن! 🛠️');
+      localStorage.setItem('ludo_session5', "ADMIN_ROOM");
+      showToast('Welcome Admin Room! 🛠️');
       loadAdminPanel();
       return;
     }
 
-    if(!db[email] || db[email].password !== pass) return showToast('غلط لاگ ان معلومات!');
+    if(!db[email] || db[email].password !== pass) return showToast('Invalid details!');
 
     currentSession = email;
-    localStorage.setItem('ludo_session4', email);
-    showToast('لاگ ان کامیاب! 🎉');
+    localStorage.setItem('ludo_session5', email);
+    showToast('Logged in successfully! 🎉');
     loadDashboard();
   }
 
@@ -360,7 +372,7 @@
     const hBox = document.getElementById('userHistoryBox');
     hBox.innerHTML = '';
     if(!user.history || user.history.length === 0) {
-      hBox.innerHTML = '<div style="font-size:10px; opacity:0.4;">کوئی ٹرانزیکشن ریکارڈ نہیں ہے۔</div>';
+      hBox.innerHTML = '<div style="font-size:10px; opacity:0.4;">No logs found.</div>';
     } else {
       user.history.slice().reverse().forEach(h => {
         hBox.innerHTML += `<div class="hist-item"><strong>${h.t}:</strong> <span style="color:#26de6e; float:right;">${h.a}</span></div>`;
@@ -375,52 +387,69 @@
   function calcMenuFee() {
     const amt = parseFloat(document.getElementById('menuDepAmt').value) || 0;
     const net = amt - (amt * 0.03);
-    document.getElementById('menuFeeNotice').textContent = `نیٹ رقم: Rs ${net >= 0 ? net.toFixed(1) : 0}`;
+    document.getElementById('menuFeeNotice').textContent = currentLang === 'en' ? `Net Amount: Rs ${net.toFixed(1)}` : `نیٹ رقم: Rs ${net.toFixed(1)}`;
   }
 
   function submitMenuDeposit() {
     const amt = parseFloat(document.getElementById('menuDepAmt').value);
     const tx = document.getElementById('menuDepTx').value.trim();
-    if(!amt || amt <= 0 || !tx) return showToast('رقم اور ٹرانزیکشن آئی ڈی لکھیں!');
+    if(!amt || amt <= 0 || !tx) return showToast('Enter valid amount & TxID!');
 
     const netAmount = amt - (amt * 0.03);
     adminReqs.push({ id: Date.now(), user: currentSession, raw: amt, net: netAmount, txid: tx });
-    localStorage.setItem('ludo_admin_reqs4', JSON.stringify(adminReqs));
+    localStorage.setItem('ludo_admin_reqs5', JSON.stringify(adminReqs));
 
     db[currentSession].depStatus = "Pending Deposit ⏳";
     db[currentSession].history.push({t: "Deposit Requested", a: `Rs ${amt} (Pending)`});
     saveAll();
     loadDashboard();
     closeMenuModal();
-    showToast('ڈپوزٹ درخواست بھیج دی گئی ہے! ✅');
+    showToast('Deposit request submitted! ✅');
   }
 
   function submitMenuWithdraw() {
-    const amt = parseFloat(document.getElementById('menuDepAmt').value);
-    if(!amt || amt <= 0) return showToast('واضح رقم درج کریں!');
-    if(db[currentSession].rs < amt) return showToast('والٹ میں رقم ناکافی ہے!');
+    const method = document.getElementById('withdrawMethod').value;
+    const num = document.getElementById('withdrawNum').value.trim();
+    const name = document.getElementById('withdrawName').value.trim();
+    const amt = parseFloat(document.getElementById('withdrawAmt').value);
 
+    if(!num || !name || !amt || amt <= 0) {
+      return showToast('Fill all withdrawal details correctly!');
+    }
+    if(db[currentSession].rs < amt) {
+      return showToast('Insufficient real cash balance!');
+    }
+
+    // Money deducted immediately from user wallet right here
     db[currentSession].rs -= amt;
-    adminWiths.push({ id: Date.now(), user: currentSession, amt: amt });
-    localStorage.setItem('ludo_admin_withs4', JSON.stringify(adminWiths));
+    
+    adminWiths.push({
+      id: Date.now(),
+      user: currentSession,
+      method: method.toUpperCase(),
+      accountNum: num,
+      accountName: name,
+      amt: amt
+    });
+    localStorage.setItem('ludo_admin_withs5', JSON.stringify(adminWiths));
 
-    db[currentSession].history.push({t: "Withdrawal Debited", a: `-Rs ${amt} (Pending)`});
+    db[currentSession].history.push({t: `Withdraw Pending (${method.toUpperCase()})`, a: `-Rs ${amt}`});
     saveAll();
     loadDashboard();
     closeMenuModal();
-    showToast('ودڈرا درخواست ایڈمن کو بھیج دی گئی! 📤');
+    showToast('Withdraw request sent! Balance deducted & placed under review. 📤');
   }
 
   function buyPackage(pName, cost) {
     const user = db[currentSession];
-    if(user.gold < cost) return showToast('پیکج کے لیے کوائنز کم ہیں!');
+    if(user.gold < cost) return showToast('Not enough gold coins!');
 
     user.gold -= cost;
     user.history.push({t: `Subscribed ${pName}`, a: `-${cost} Coins`});
     saveAll();
     loadDashboard();
     closeMenuModal();
-    showToast(`مبارک ہو! ${pName} سبسکرائب ہو گیا! 🎉`);
+    showToast(`Successfully subscribed to ${pName}! 🎉`);
   }
 
   function claimDailyBonus() {
@@ -428,16 +457,15 @@
     db[currentSession].history.push({t: "Daily Bonus Pack", a: "+500 Gold"});
     saveAll();
     loadDashboard();
-    showToast('500 گولڈ کوائنز مل گئے! 🎁');
+    showToast('+500 Gold Claimed! 🎁');
   }
 
-  // FIXED REAL NAVIGATION TRIGGER
   function realLaunchGame(mode) {
     const bet = parseInt(document.getElementById('gameBetSelect').value);
-    showToast(`🎮 میچ لوڈ ہو رہا ہے موڈ: ${mode.toUpperCase()}...`);
+    showToast(`Launching ${mode.toUpperCase()} game mode...`);
     setTimeout(() => {
       window.location.href = `game.html?mode=${mode}&bet=${bet}`;
-    }, 1200);
+    }, 1000);
   }
 
   // ================= ADMIN SYSTEM IMPLEMENTATION =================
@@ -459,7 +487,7 @@
     });
 
     const dBox = document.getElementById('admDepsQueue');
-    dBox.innerHTML = adminReqs.length === 0 ? 'کوئی ڈپازٹ درخواست نہیں ہے' : '';
+    dBox.innerHTML = adminReqs.length === 0 ? 'No pending deposits.' : '';
     adminReqs.forEach(r => {
       dBox.innerHTML += `<div style="background:#140821; padding:6px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
         <div>User: ${r.user}<br>TxID: ${r.txid} | <span style="color:#26de6e;">Rs ${r.net}</span></div>
@@ -468,10 +496,10 @@
     });
 
     const wBox = document.getElementById('admWithsQueue');
-    wBox.innerHTML = adminWiths.length === 0 ? 'کوئی ودڈرا درخواست نہیں ہے' : '';
+    wBox.innerHTML = adminWiths.length === 0 ? 'No pending withdrawals.' : '';
     adminWiths.forEach(w => {
       wBox.innerHTML += `<div style="background:#140821; padding:6px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
-        <div>User: ${w.user}<br><span style="color:#ff5b5b;">Amt: Rs ${w.amt}</span></div>
+        <div>User: ${w.user}<br><span style="color:#ffea79;">${w.method}: ${w.accountNum} (${w.accountName})</span><br><span style="color:#ff5b5b; font-weight:bold;">Amount: Rs ${w.amt}</span></div>
         <button onclick="approveWith(${w.id})" style="background:#ff5b5b; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer;">Pay/Clear</button>
       </div>`;
     });
@@ -499,11 +527,11 @@
     if(db[r.user]) {
       db[r.user].rs += r.net;
       db[r.user].depStatus = "Approved ✅";
-      db[r.user].history.push({t: "Deposit Approved", a: `+Rs ${r.net}`});
+      db[r.user].history.push({t: "Deposit Approved Successfully", a: `+Rs ${r.net}`});
     }
     adminReqs.splice(idx, 1);
-    localStorage.setItem('ludo_admin_reqs4', JSON.stringify(adminReqs));
-    saveAll(); loadAdminPanel(); showToast('ڈپوزٹ منظور کر لیا گیا!');
+    localStorage.setItem('ludo_admin_reqs5', JSON.stringify(adminReqs));
+    saveAll(); loadAdminPanel(); showToast('Deposit approved and credited!');
   }
 
   function approveWith(id) {
@@ -511,17 +539,19 @@
     if(idx === -1) return;
     const w = adminWiths[idx];
     if(db[w.user]) {
-      db[w.user].history.push({t: "Withdraw Completed Successfully", a: `Paid Rs ${w.amt}`});
+      // Find history log and replace it as completed
+      db[w.user].history.push({t: `Withdraw Completed (${w.method})`, a: `Paid Rs ${w.amt}`});
     }
     adminWiths.splice(idx, 1);
-    localStorage.setItem('ludo_admin_withs4', JSON.stringify(adminWiths));
-    saveAll(); loadAdminPanel(); showToast('ودڈرا پیمنٹ کلیئر کر دی گئی!');
+    localStorage.setItem('ludo_admin_withs5', JSON.stringify(adminWiths));
+    saveAll(); loadAdminPanel(); showToast('Withdraw request processed and successfully cleared!');
   }
 
-  function saveAll() { localStorage.setItem('ludo_db4', JSON.stringify(db)); }
-  function logout() { localStorage.removeItem('ludo_session4'); currentSession = null; switchScreen('loginScreen'); }
+  function saveAll() { localStorage.setItem('ludo_db5', JSON.stringify(db)); }
+  function logout() { localStorage.removeItem('ludo_session5'); currentSession = null; switchScreen('loginScreen'); }
 
   window.onload = function() {
+    applyLanguage(currentLang);
     if(currentSession === "ADMIN_ROOM") {
       loadAdminPanel();
     } else if(currentSession && db[currentSession]) {
