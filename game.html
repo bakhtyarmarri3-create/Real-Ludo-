@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ludo Star Board</title>
+<title>Ludo Star</title>
 <style>
   * { box-sizing: border-box; margin:0; padding:0; }
   body {
@@ -18,94 +18,235 @@
     width: 420px;
     min-height: 100vh;
     position: relative;
-    padding-bottom: 90px;
   }
-  .topbar {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding: 14px 16px 6px;
+
+  /* Single shared wallet */
+  .wallet-display {
+    display: flex;
+    justify-content: center;
+    padding: 10px 14px 6px;
   }
-  .icon-btn {
-    width:42px; height:42px;
-    border-radius:12px;
-    background: rgba(255,255,255,0.08);
-    display:flex; align-items:center; justify-content:center;
-    font-size:20px;
-    border: 1px solid rgba(255,255,255,0.1);
-    cursor:pointer;
-  }
-  .icon-btn:active { transform: scale(0.92); }
-  .spectator-pill {
-    flex:1;
-    margin: 0 10px;
-    background: rgba(0,0,0,0.35);
+  .wallet-card {
+    background: linear-gradient(135deg, rgba(80,30,120,0.85), rgba(40,10,70,0.95));
+    border: 1.5px solid rgba(255,215,0,0.35);
     border-radius: 20px;
-    padding: 9px 16px;
-    font-weight:600;
-    font-size:13px;
-    text-align:center;
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.4);
   }
-  .gift-bag { font-size: 26px; cursor:pointer; }
-
-  .turn-banner {
-    text-align:center;
-    padding: 6px 16px;
-    font-size: 15px;
-    font-weight:700;
+  .wallet-icon { font-size: 28px; line-height: 1; }
+  .wallet-center { display: flex; flex-direction: column; align-items: flex-start; }
+  .wallet-label {
+    font-size: 10px; opacity: 0.55;
+    letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 1px;
   }
-  .turn-banner .dot {
-    display:inline-block;
-    width:11px;height:11px;
-    border-radius:50%;
-    margin-right:6px;
-    vertical-align:middle;
+  .wallet-total {
+    font-size: 28px; font-weight: 800;
+    color: #ffd700; line-height: 1;
   }
 
-  .board-wrap { padding: 4px 10px; }
+  /* Board outer wrapper with corner dice */
+  .board-outer {
+    position: relative;
+    margin: 10px 14px;
+  }
 
+  /* The actual ludo board */
   .board {
-    position:relative;
-    width:100%;
+    position: relative;
+    width: 100%;
     aspect-ratio: 1/1;
     background: #fff;
-    border-radius: 16px;
-    border: 6px solid #4f2f18;
-    overflow:hidden;
+    border-radius: 12px;
+    border: 5px solid #4f2f18;
+    overflow: visible;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 
+  /* Corner Dice - positioned at 4 corners of the board */
+  .corner-dice {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  /* Positions - outside board corners */
+  .corner-dice.green  { top: -80px; left: -8px; }
+  .corner-dice.yellow { top: -80px; right: -8px; }
+  .corner-dice.red    { bottom: -80px; left: -8px; }
+  .corner-dice.blue   { bottom: -80px; right: -8px; }
+
+  /* The dice face itself */
+  .dice-face {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(145deg, #ffffff, #e0e0e0);
+    border-radius: 10px;
+    border: 3px solid #888;
+    display: grid;
+    grid-template-areas:
+      "a . c"
+      "e g f"
+      "d . b";
+    padding: 6px;
+    gap: 2px;
+    cursor: pointer;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.4), inset 1px 1px 2px rgba(255,255,255,0.8);
+    transition: transform 0.1s, box-shadow 0.1s;
+    position: relative;
+  }
+  .dice-face:active { transform: scale(0.92); box-shadow: 1px 1px 4px rgba(0,0,0,0.4); }
+
+  /* Inactive dice - greyed out */
+  .corner-dice:not(.active) .dice-face {
+    opacity: 0.45;
+    cursor: default;
+    filter: grayscale(0.5);
+  }
+  .corner-dice.active .dice-face {
+    border-color: #222;
+    animation: dice-glow 0.8s infinite alternate;
+  }
+  @keyframes dice-glow {
+    from { box-shadow: 3px 3px 8px rgba(0,0,0,0.4), 0 0 8px 2px rgba(255,220,0,0.4); }
+    to   { box-shadow: 3px 3px 8px rgba(0,0,0,0.4), 0 0 16px 6px rgba(255,220,0,0.7); }
+  }
+  @keyframes dice-spin {
+    0%   { transform: rotate(0deg) scale(1); }
+    25%  { transform: rotate(90deg) scale(0.8); }
+    50%  { transform: rotate(180deg) scale(1); }
+    75%  { transform: rotate(270deg) scale(0.8); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+  .dice-face.rolling { animation: dice-spin 0.15s linear infinite; }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #111;
+    align-self: center;
+    justify-self: center;
+    display: none;
+  }
+  .dot.show { display: block; }
+
+  .dot-a { grid-area: a; }
+  .dot-b { grid-area: b; }
+  .dot-c { grid-area: c; }
+  .dot-d { grid-area: d; }
+  .dot-e { grid-area: e; }
+  .dot-f { grid-area: f; }
+  .dot-g { grid-area: g; }
+
+  /* Timer bar below dice */
+  .timer-bar-wrap {
+    width: 52px;
+    height: 5px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%;
+    width: 100%;
+    border-radius: 3px;
+    background: #4caf50;
+    transform-origin: left;
+    transition: width 1s linear, background 0.3s;
+  }
+
+  /* 3-dot menu button - outside dice, on the side */
+  .dots-btn {
+    position: absolute;
+    width: 20px;
+    height: 44px;
+    background: rgba(0,0,0,0.55);
+    border-radius: 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255,255,255,0.85);
+    z-index: 35;
+    line-height: 1;
+    letter-spacing: -1px;
+    top: 4px;
+  }
+  /* Green: dots on right side, Yellow: dots on left side */
+  /* Red: dots on right side, Blue: dots on left side */
+  .corner-dice.green  .dots-btn { right: -24px; }
+  .corner-dice.yellow .dots-btn { left: -24px; }
+  .corner-dice.red    .dots-btn { right: -24px; }
+  .corner-dice.blue   .dots-btn { left: -24px; }
+
+  /* Emoji reaction dropdown */
+  .emoji-menu {
+    position: absolute;
+    background: rgba(15,8,35,0.97);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 10px;
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    z-index: 200;
+    width: 180px;
+  }
+  .emoji-menu.show { display: grid; }
+
+  /* Position menus so they don't go off screen */
+  .corner-dice.green  .emoji-menu { top: 60px; left: 0; }
+  .corner-dice.yellow .emoji-menu { top: 60px; right: 0; }
+  .corner-dice.red    .emoji-menu { bottom: 60px; left: 0; }
+  .corner-dice.blue   .emoji-menu { bottom: 60px; right: 0; }
+
+  .em-btn {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .em-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.15); }
+
+  /* Home quads */
   .home-quad {
-    position:absolute;
-    width:40%; height:40%;
+    position:absolute; width:40%; height:40%;
     display:flex; align-items:center; justify-content:center;
   }
-  .home-quad.q-green  { top:0; left:0; background:#1f9d4e; }
-  .home-quad.q-yellow { top:0; right:0; background:#e8b400; }
-  .home-quad.q-red    { bottom:0; left:0; background:#d32f2f; }
-  .home-quad.q-blue   { bottom:0; right:0; background:#2266cc; }
+  .home-quad.q-green  { top:0; left:0; background:#1f9d4e; border-radius: 8px 0 0 0; }
+  .home-quad.q-yellow { top:0; right:0; background:#e8b400; border-radius: 0 8px 0 0; }
+  .home-quad.q-red    { bottom:0; left:0; background:#d32f2f; border-radius: 0 0 0 8px; }
+  .home-quad.q-blue   { bottom:0; right:0; background:#2266cc; border-radius: 0 0 8px 0; }
   .home-quad .inner-square {
     width:78%; height:78%;
     background: rgba(255,255,255,0.92);
-    border-radius: 12px;
+    border-radius: 10px;
   }
 
   .center-tri {
-    position:absolute;
-    width:20%; height:20%;
-    top:40%; left:40%;
-    z-index:3;
+    position:absolute; width:20%; height:20%; top:40%; left:40%; z-index:3;
   }
   .center-tri svg { width:100%; height:100%; display:block; }
 
   .path-cell {
-    position:absolute;
-    width: 6.5%; height: 6.5%;
-    background:#fff;
-    border: 1px solid #ccc;
+    position:absolute; width:6.5%; height:6.5%;
+    background:#fff; border:1px solid #ccc;
     display:flex; align-items:center; justify-content:center;
-    font-size: 9px;
-    z-index:2;
+    font-size:9px; z-index:2;
   }
   .path-cell.start-green  { background:#1f9d4e; }
   .path-cell.start-yellow { background:#e8b400; }
@@ -119,167 +260,163 @@
   .path-cell.start-square::after { content:"🚩"; font-size:10px; }
 
   .piece {
-    position:absolute;
-    width: 6%; height:6%;
+    position:absolute; width:6%; height:6%;
     border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    font-size: 8px;
-    font-weight:800;
-    color:#fff;
+    font-size:8px; font-weight:800; color:#fff;
     box-shadow: inset 0 -3px 5px rgba(0,0,0,0.35), 0 2px 5px rgba(0,0,0,0.5);
-    cursor:pointer;
-    z-index: 10;
-    transition: left .4s ease, top .4s ease, transform .15s;
+    cursor:pointer; z-index:10;
+    transition: left .4s ease, top .4s ease;
     transform: translate(-50%,-50%);
   }
-  .piece:active { transform: translate(-50%,-50%) scale(0.85); }
-  .piece.green-piece { background: radial-gradient(circle at 35% 30%, #3fae5e, #0f5c28); }
+  .piece.green-piece  { background: radial-gradient(circle at 35% 30%, #3fae5e, #0f5c28); }
   .piece.yellow-piece { background: radial-gradient(circle at 35% 30%, #ffd84d, #b07d00); }
-  .piece.red-piece { background: radial-gradient(circle at 35% 30%, #ff6b5b, #a30000); }
-  .piece.blue-piece { background: radial-gradient(circle at 35% 30%, #5aa8ff, #0c3e8a); }
+  .piece.red-piece    { background: radial-gradient(circle at 35% 30%, #ff6b5b, #a30000); }
+  .piece.blue-piece   { background: radial-gradient(circle at 35% 30%, #5aa8ff, #0c3e8a); }
   .piece.movable {
     box-shadow: 0 0 0 3px #fff, 0 0 14px 5px #fff8c4;
     animation: pulse 0.7s infinite;
   }
   @keyframes pulse {
     0%,100% { transform: translate(-50%,-50%) scale(1); }
-    50% { transform: translate(-50%,-50%) scale(1.25); }
+    50%     { transform: translate(-50%,-50%) scale(1.25); }
   }
 
   .status-text {
-    text-align:center;
-    font-size: 13px;
-    opacity:0.9;
-    padding: 8px 16px 4px;
-    min-height: 18px;
+    text-align:center; font-size:13px; opacity:0.9;
+    padding: 6px 16px 4px; min-height:18px;
   }
-
-  .dice-row {
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap: 16px;
-    padding: 4px 18px 4px;
-  }
-  .dice-box {
-    width:60px; height:60px;
-    background: linear-gradient(180deg,#fff,#ddd);
-    border-radius:14px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:28px;
-    color:#222;
-    font-weight:800;
-    cursor:pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-    border: 3px solid #222;
-    user-select:none;
-  }
-  .dice-box.rolling { animation: spin 0.4s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .current-player {
-    display:flex;
-    align-items:center;
-    gap: 14px;
-    padding: 10px 18px 6px;
-  }
-  .me-avatar-wrap { width:54px;height:54px; }
-  .me-avatar-wrap img {
-    width:54px;height:54px;
-    border-radius:50%;
-    object-fit:cover;
-    border: 3px solid #3d8b3d;
-  }
-  .player-name { font-weight:700; font-size:14px; }
-  .player-score { font-size:12px; opacity:0.85; }
-
-  .bottom-bar {
-    position:absolute;
-    bottom: 14px;
-    left:0; right:0;
-    display:flex;
-    justify-content:space-between;
-    padding: 0 18px;
-  }
-  .pill-btn {
-    flex:1;
-    margin: 0 6px;
-    height:44px;
-    border-radius:22px;
-    background: rgba(255,255,255,0.12);
-    display:flex; align-items:center; justify-content:center;
-    font-size:19px;
-    cursor:pointer;
-    border:1px solid rgba(255,255,255,0.1);
-  }
-  .pill-btn:active { transform: scale(0.95); }
 
   .toast {
-    position: fixed;
-    top: 16px; left:50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.85);
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-size: 13px;
-    opacity:0;
-    transition: opacity .3s;
-    z-index: 50;
-    white-space:nowrap;
+    position:fixed; top:16px; left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);
+    padding:10px 18px; border-radius:10px;
+    font-size:13px; opacity:0; transition:opacity .3s;
+    z-index:50; white-space:nowrap;
   }
   .toast.show { opacity:1; }
 
   .winner-overlay {
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.8);
-    display:none;
-    align-items:center; justify-content:center;
-    z-index: 100;
-    flex-direction:column;
-    gap: 16px;
+    position:fixed; inset:0; background:rgba(0,0,0,0.8);
+    display:none; align-items:center; justify-content:center;
+    z-index:100; flex-direction:column; gap:16px; padding:20px;
   }
   .winner-overlay.show { display:flex; }
-  .winner-overlay h1 { font-size: 26px; }
+  .winner-overlay h1 { font-size:26px; text-align:center; }
+  .winner-info { font-size:14px; text-align:center; line-height:1.6; }
   .winner-overlay button {
-    padding: 12px 28px;
-    border-radius: 24px;
-    border:none;
-    background:#f3c623;
-    font-weight:700;
-    font-size:16px;
-    cursor:pointer;
+    padding:12px 28px; border-radius:24px; border:none;
+    background:#f3c623; font-weight:700; font-size:16px; cursor:pointer;
+  }
+
+  /* Emoji popup near corner dice */
+  .emoji-popup {
+    position: fixed;
+    font-size: 52px;
+    z-index: 999;
+    pointer-events: none;
+    animation: corner-pop 1.8s ease-out forwards;
+  }
+  @keyframes corner-pop {
+    0%   { opacity: 0; transform: scale(0.3); }
+    20%  { opacity: 1; transform: scale(1.3); }
+    60%  { opacity: 1; transform: scale(1) translateY(-10px); }
+    100% { opacity: 0; transform: scale(0.7) translateY(-40px); }
   }
 </style>
 </head>
 <body>
 <div class="app">
-
   <div class="toast" id="toast"></div>
-
   <div class="winner-overlay" id="winnerOverlay">
-    <h1 id="winnerText">🎉 جیت گئے!</h1>
+    <h1 id="winnerText">🎉 جیت گیا!</h1>
+    <div class="winner-info" id="winnerInfo"></div>
     <button onclick="location.reload()">دوبارہ کھیلیں</button>
   </div>
 
-  <div class="topbar">
-    <div class="icon-btn" id="settingsBtn">⚙️</div>
-    <div class="icon-btn" id="trophyBtn">🏆</div>
-    <div class="spectator-pill">👁️ Spectator 0</div>
-    <div class="gift-bag" id="bagBtn">🎁</div>
+  <div class="wallet-display">
+    <div class="wallet-card">
+      <div class="wallet-icon">👛</div>
+      <div class="wallet-center">
+        <div class="wallet-label">مشترکہ والٹ</div>
+        <div class="wallet-total" id="totalCoins">2000</div>
+      </div>
+    </div>
   </div>
 
-  <div class="turn-banner" id="turnBanner">
-    <span class="dot" id="turnDot" style="background:#1f9d4e;"></span>
-    <span id="turnLabel">سبز کی باری</span>
-  </div>
+  <div class="board-outer">
 
-  <div class="board-wrap">
+    <!-- GREEN dice - top left -->
+    <div class="corner-dice green" id="cd-green">
+      <div class="dots-btn" id="dotsbtn-green">⋮</div>
+      <div class="dice-face" id="df-green">
+        <div class="dot dot-a" id="g-a"></div>
+        <div class="dot dot-b" id="g-b"></div>
+        <div class="dot dot-c" id="g-c"></div>
+        <div class="dot dot-d" id="g-d"></div>
+        <div class="dot dot-e" id="g-e"></div>
+        <div class="dot dot-f" id="g-f"></div>
+        <div class="dot dot-g" id="g-g"></div>
+      </div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="tb-green"></div></div>
+      <div class="emoji-menu" id="em-green"></div>
+    </div>
+
+    <!-- YELLOW dice - top right -->
+    <div class="corner-dice yellow" id="cd-yellow">
+      <div class="dots-btn" id="dotsbtn-yellow">⋮</div>
+      <div class="dice-face" id="df-yellow">
+        <div class="dot dot-a" id="y-a"></div>
+        <div class="dot dot-b" id="y-b"></div>
+        <div class="dot dot-c" id="y-c"></div>
+        <div class="dot dot-d" id="y-d"></div>
+        <div class="dot dot-e" id="y-e"></div>
+        <div class="dot dot-f" id="y-f"></div>
+        <div class="dot dot-g" id="y-g"></div>
+      </div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="tb-yellow"></div></div>
+      <div class="emoji-menu" id="em-yellow"></div>
+    </div>
+
+    <!-- RED dice - bottom left -->
+    <div class="corner-dice red" id="cd-red">
+      <div class="dots-btn" id="dotsbtn-red">⋮</div>
+      <div class="dice-face" id="df-red">
+        <div class="dot dot-a" id="r-a"></div>
+        <div class="dot dot-b" id="r-b"></div>
+        <div class="dot dot-c" id="r-c"></div>
+        <div class="dot dot-d" id="r-d"></div>
+        <div class="dot dot-e" id="r-e"></div>
+        <div class="dot dot-f" id="r-f"></div>
+        <div class="dot dot-g" id="r-g"></div>
+      </div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="tb-red"></div></div>
+      <div class="emoji-menu" id="em-red"></div>
+    </div>
+
+    <!-- BLUE dice - bottom right -->
+    <div class="corner-dice blue" id="cd-blue">
+      <div class="dots-btn" id="dotsbtn-blue">⋮</div>
+      <div class="dice-face" id="df-blue">
+        <div class="dot dot-a" id="b-a"></div>
+        <div class="dot dot-b" id="b-b"></div>
+        <div class="dot dot-c" id="b-c"></div>
+        <div class="dot dot-d" id="b-d"></div>
+        <div class="dot dot-e" id="b-e"></div>
+        <div class="dot dot-f" id="b-f"></div>
+        <div class="dot dot-g" id="b-g"></div>
+      </div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="tb-blue"></div></div>
+      <div class="emoji-menu" id="em-blue"></div>
+    </div>
+
+    <!-- The Board -->
     <div class="board" id="board">
       <div class="home-quad q-green"><div class="inner-square"></div></div>
       <div class="home-quad q-yellow"><div class="inner-square"></div></div>
       <div class="home-quad q-red"><div class="inner-square"></div></div>
       <div class="home-quad q-blue"><div class="inner-square"></div></div>
-
       <div class="center-tri">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none">
           <polygon points="0,0 50,50 0,100" fill="#1f9d4e"/>
@@ -288,40 +425,36 @@
           <polygon points="0,100 50,50 100,100" fill="#d32f2f"/>
         </svg>
       </div>
-
-      <!-- path cells + pieces injected here by JS -->
     </div>
   </div>
 
-  <div class="status-text" id="statusText">ڈائس دبائیں اور کھیل شروع کریں</div>
-
-  <div class="dice-row">
-    <div class="dice-box" id="diceBox">🎲</div>
-  </div>
-
-  <div class="current-player">
-    <div class="me-avatar-wrap">
-      <img src="https://images.unsplash.com/photo-1547721064-da6cfb341d50?w=200&h=200&fit=crop" alt="me">
-    </div>
-    <div>
-      <div class="player-name">Player_546197</div>
-      <div class="player-score" id="scoreLine">G:0 Y:0 R:0 B:0 گھر پہنچیں</div>
-    </div>
-  </div>
-
-  <div class="bottom-bar">
-    <div class="pill-btn" id="micToggle">🎙️</div>
-    <div class="pill-btn" id="emojiBtn">🙂</div>
-    <div class="pill-btn" id="chatBtn">💬</div>
-  </div>
+  <div class="status-text" id="statusText">اپنے کونے کا ڈائس دبائیں</div>
 </div>
 
 <script>
-const CELL = 100/15;
+const EMOJIS = ['😂','😡','😍','🔥','👋','🎉','💯','👏'];
+const TOTAL_TIME = 20;
+const COLORS = ['green','yellow','red','blue'];
+const COLOR_PFX = { green:'g', yellow:'y', red:'r', blue:'b' };
+const COLOR_NAME_UR = { green:'سبز', yellow:'پیلا', red:'سرخ', blue:'نیلا' };
+const PLAYER_NAMES = { green:'Player_546197', yellow:'Player_823491', red:'Player_102934', blue:'Player_745821' };
+const START_OFFSET = { green:0, yellow:13, blue:26, red:39 };
+const SAFE_ABS = [0,8,13,21,26,34,39,47];
+const START_ABS = [0,13,26,39];
 
-function cellPct(row, col) {
-  return { left: (col + 0.5) * CELL, top: (row + 0.5) * CELL };
-}
+// Dice dot patterns: which dots (a-g) are active for 1-6
+// Layout: a=top-left, c=top-right, e=mid-left, g=center, f=mid-right, d=bot-left, b=bot-right
+const DOT_PATTERNS = {
+  1: ['g'],
+  2: ['a','b'],
+  3: ['a','g','b'],
+  4: ['a','c','d','b'],
+  5: ['a','c','g','d','b'],
+  6: ['a','c','e','f','d','b']
+};
+
+const CELL = 100/15;
+function cellPct(row, col) { return { left:(col+0.5)*CELL, top:(row+0.5)*CELL }; }
 
 const mainPath = [
   [6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],
@@ -330,22 +463,13 @@ const mainPath = [
   [14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],
   [8,1],[8,0],[7,0],[6,0]
 ];
-
 const homeColumns = {
   green:  [[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],
   yellow: [[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],
   blue:   [[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],
   red:    [[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]
 };
-
 const CENTER_CELL = [7,7];
-const COLORS = ['green','yellow','red','blue'];
-const COLOR_HEX = { green:'#1f9d4e', yellow:'#e8b400', red:'#d32f2f', blue:'#2266cc' };
-const COLOR_NAME_UR = { green:'سبز', yellow:'پیلا', red:'سرخ', blue:'نیلا' };
-const START_OFFSET = { green:0, yellow:13, blue:26, red:39 };
-const SAFE_ABS = [0,8,13,21,26,34,39,47];
-const START_ABS = [0,13,26,39];
-
 const homeSlots = {
   green:  [[13,13],[13,27],[27,13],[27,27]],
   yellow: [[13,73],[13,87],[27,73],[27,87]],
@@ -353,79 +477,209 @@ const homeSlots = {
   blue:   [[73,73],[73,87],[87,73],[87,87]]
 };
 
+// Build board cells
 const board = document.getElementById('board');
-
 function colorOfStartIdx(i) {
   for (const c of COLORS) if (START_OFFSET[c] === i) return c;
   return null;
 }
-
 mainPath.forEach((rc, i) => {
   const div = document.createElement('div');
   div.className = 'path-cell';
   const pos = cellPct(rc[0], rc[1]);
-  div.style.left = pos.left + '%';
-  div.style.top = pos.top + '%';
+  div.style.left = pos.left + '%'; div.style.top = pos.top + '%';
   div.style.transform = 'translate(-50%,-50%)';
-  if (START_ABS.includes(i)) {
-    const c = colorOfStartIdx(i);
-    div.classList.add('start-' + c, 'start-square');
-  } else if (SAFE_ABS.includes(i)) {
-    div.classList.add('safe-star');
-  }
+  if (START_ABS.includes(i)) { const c = colorOfStartIdx(i); div.classList.add('start-'+c,'start-square'); }
+  else if (SAFE_ABS.includes(i)) div.classList.add('safe-star');
   board.appendChild(div);
 });
-
 COLORS.forEach(color => {
   homeColumns[color].forEach(rc => {
     const div = document.createElement('div');
-    div.className = 'path-cell home-' + color;
+    div.className = 'path-cell home-'+color;
     const pos = cellPct(rc[0], rc[1]);
-    div.style.left = pos.left + '%';
-    div.style.top = pos.top + '%';
+    div.style.left = pos.left+'%'; div.style.top = pos.top+'%';
     div.style.transform = 'translate(-50%,-50%)';
     board.appendChild(div);
   });
 });
 
+// Build emoji menus
+COLORS.forEach(color => {
+  const em = document.getElementById('em-'+color);
+  EMOJIS.forEach(emoji => {
+    const btn = document.createElement('div');
+    btn.className = 'em-btn'; btn.textContent = emoji;
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      em.classList.remove('show');
+      showEmojiCenter(emoji, color);
+    });
+    em.appendChild(btn);
+  });
+  // 3-dot button
+  document.getElementById('dotsbtn-'+color).addEventListener('click', e => {
+    e.stopPropagation();
+    const wasOpen = em.classList.contains('show');
+    document.querySelectorAll('.emoji-menu').forEach(m => m.classList.remove('show'));
+    if (!wasOpen) em.classList.add('show');
+  });
+});
+document.addEventListener('click', () => {
+  document.querySelectorAll('.emoji-menu').forEach(m => m.classList.remove('show'));
+});
+
+// Corner dice positions (approximate screen coords relative to viewport)
+const CORNER_POSITIONS = {
+  green:  { anchor: 'top-left' },
+  yellow: { anchor: 'top-right' },
+  red:    { anchor: 'bottom-left' },
+  blue:   { anchor: 'bottom-right' }
+};
+
+function showEmojiCenter(emoji, color) {
+  const diceEl = document.getElementById('cd-' + color);
+  const rect = diceEl.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = 'emoji-popup';
+  popup.textContent = emoji;
+
+  // Position near the dice corner
+  const anchor = CORNER_POSITIONS[color].anchor;
+  if (anchor === 'top-left') {
+    popup.style.left = (rect.right + 8) + 'px';
+    popup.style.top = rect.top + 'px';
+  } else if (anchor === 'top-right') {
+    popup.style.right = (window.innerWidth - rect.left + 8) + 'px';
+    popup.style.top = rect.top + 'px';
+  } else if (anchor === 'bottom-left') {
+    popup.style.left = (rect.right + 8) + 'px';
+    popup.style.top = (rect.top - 60) + 'px';
+  } else {
+    popup.style.right = (window.innerWidth - rect.left + 8) + 'px';
+    popup.style.top = (rect.top - 60) + 'px';
+  }
+
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 1800);
+  showToast(`${PLAYER_NAMES[color]} نے ${emoji} بھیجا`);
+}
+
+// Game state
 let state = {
   turnIndex: 0,
   positions: { green:[-1,-1,-1,-1], yellow:[-1,-1,-1,-1], red:[-1,-1,-1,-1], blue:[-1,-1,-1,-1] },
   finished: { green:0, yellow:0, red:0, blue:0 },
-  diceValue: 0,
+  diceValue: { green:0, yellow:0, red:0, blue:0 },
   rolled: false,
-  consecSixes: 0
+  consecSixes: 0,
+  coins: { green:500, yellow:500, red:500, blue:500 },
+  turnTimer: null,
+  timeLeft: TOTAL_TIME
 };
 
 const toast = document.getElementById('toast');
 function showToast(msg) {
-  toast.textContent = msg;
-  toast.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(()=> toast.classList.remove('show'), 1400);
+  toast.textContent = msg; toast.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => toast.classList.remove('show'), 1600);
 }
-
+function updateWallet() {
+  const total = Object.values(state.coins).reduce((a,b)=>a+b,0);
+  document.getElementById('totalCoins').textContent = total;
+  // hidden refs for win screen
+  ['green','yellow','red','blue'].forEach(c => {
+    const el = document.getElementById(c+'Coins');
+    if (el) el.textContent = state.coins[c];
+  });
+}
 function currentColor() { return COLORS[state.turnIndex]; }
 
-function updateTurnBanner() {
-  const c = currentColor();
-  document.getElementById('turnDot').style.background = COLOR_HEX[c];
-  document.getElementById('turnLabel').textContent = COLOR_NAME_UR[c] + ' کی باری';
-}
-function updateScoreLine() {
-  document.getElementById('scoreLine').textContent =
-    `G:${state.finished.green} Y:${state.finished.yellow} R:${state.finished.red} B:${state.finished.blue} گھر پہنچیں`;
+// Draw dice face
+function drawDice(color, value) {
+  const pfx = COLOR_PFX[color];
+  ['a','b','c','d','e','f','g'].forEach(d => {
+    const el = document.getElementById(pfx+'-'+d);
+    el.classList.toggle('show', value > 0 && (DOT_PATTERNS[value]||[]).includes(d));
+  });
 }
 
-function movablePieces(color, dice) {
-  const arr = state.positions[color];
-  const movable = [];
-  arr.forEach((pos, idx) => {
-    if (pos === -1) {
-      if (dice === 6) movable.push(idx);
-    } else if (pos >= 0 && pos <= 56) {
-      if (pos + dice <= 57) movable.push(idx);
+// Update timer bar
+function updateTimerBar(color, timeLeft) {
+  const bar = document.getElementById('tb-'+color);
+  const pct = timeLeft / TOTAL_TIME;
+  bar.style.width = (pct * 100) + '%';
+  if (pct > 0.5) bar.style.background = '#4caf50';
+  else if (pct > 0.25) bar.style.background = '#ff9800';
+  else bar.style.background = '#f44336';
+}
+
+function updateTurnDisplay() {
+  COLORS.forEach(color => {
+    const cd = document.getElementById('cd-'+color);
+    if (color === currentColor()) {
+      cd.classList.add('active');
+      updateTimerBar(color, state.timeLeft);
+    } else {
+      cd.classList.remove('active');
+      updateTimerBar(color, TOTAL_TIME);
     }
+  });
+}
+
+function startTurnTimer() {
+  clearInterval(state.turnTimer);
+  state.timeLeft = TOTAL_TIME;
+  updateTurnDisplay();
+  state.turnTimer = setInterval(() => {
+    state.timeLeft--;
+    updateTimerBar(currentColor(), state.timeLeft);
+    if (state.timeLeft <= 0) {
+      clearInterval(state.turnTimer);
+      showToast(`${COLOR_NAME_UR[currentColor()]} کا وقت ختم!`);
+      nextTurn();
+    }
+  }, 1000);
+}
+
+function rollDiceForColor(color) {
+  if (color !== currentColor()) { showToast('یہ آپ کی باری نہیں'); return; }
+  if (state.rolled) { showToast('پہلے گوٹی چلائیں'); return; }
+
+  const df = document.getElementById('df-'+color);
+  df.classList.add('rolling');
+  let n = 0, count = 0;
+  const spin = setInterval(() => {
+    n = Math.ceil(Math.random()*6);
+    drawDice(color, n);
+    count++;
+  }, 80);
+
+  setTimeout(() => {
+    clearInterval(spin);
+    df.classList.remove('rolling');
+    n = Math.ceil(Math.random()*6);
+    state.diceValue[color] = n;
+    drawDice(color, n);
+    state.rolled = true;
+    document.getElementById('statusText').textContent =
+      `${COLOR_NAME_UR[color]} نے ${n} نمبر پایا`;
+    highlightMovable();
+  }, 600);
+}
+
+// Wire up dice clicks
+COLORS.forEach(color => {
+  document.getElementById('df-'+color).addEventListener('click', (e) => {
+    if (e.target.classList.contains('dots-btn') || e.target.id === 'dotsbtn-'+color) return;
+    rollDiceForColor(color);
+  });
+});
+
+function movablePieces(color, dice) {
+  const arr = state.positions[color], movable = [];
+  arr.forEach((pos, idx) => {
+    if (pos === -1) { if (dice === 6) movable.push(idx); }
+    else if (pos >= 0 && pos <= 56) { if (pos+dice <= 57) movable.push(idx); }
   });
   return movable;
 }
@@ -434,48 +688,25 @@ function highlightMovable() {
   document.querySelectorAll('.piece').forEach(p => p.classList.remove('movable'));
   if (!state.rolled) return;
   const color = currentColor();
-  const movable = movablePieces(color, state.diceValue);
+  const movable = movablePieces(color, state.diceValue[color]);
   movable.forEach(idx => {
     const el = document.querySelector(`.piece[data-color="${color}"][data-id="${idx}"]`);
     if (el) el.classList.add('movable');
   });
   if (movable.length === 0) {
-    document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]}: کوئی چال ممکن نہیں — اگلی باری`;
+    document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]}: کوئی چال ممکن نہیں`;
     setTimeout(nextTurn, 1100);
   } else {
     document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]}: چمکتی گوٹی پر ٹیپ کریں`;
   }
 }
 
-function rollDice() {
-  if (state.rolled) { showToast('پہلے گوٹی چلائیں'); return; }
-  const diceBox = document.getElementById('diceBox');
-  diceBox.classList.add('rolling');
-  let n = 0;
-  const spin = setInterval(()=> { n = Math.ceil(Math.random()*6); diceBox.textContent = n; }, 70);
-  setTimeout(()=> {
-    clearInterval(spin);
-    diceBox.classList.remove('rolling');
-    n = Math.ceil(Math.random()*6);
-    diceBox.textContent = n;
-    state.diceValue = n;
-    state.rolled = true;
-    document.getElementById('statusText').textContent =
-      `${COLOR_NAME_UR[currentColor()]} نے ${n} نمبر پایا`;
-    highlightMovable();
-  }, 650);
-}
-
 function pieceCoord(color, pos) {
   if (pos === -1) return null;
   if (pos === 57) return cellPct(CENTER_CELL[0], CENTER_CELL[1]);
-  if (pos >= 51) {
-    const rc = homeColumns[color][pos - 51];
-    return cellPct(rc[0], rc[1]);
-  }
-  const abs = (START_OFFSET[color] + pos) % 52;
-  const rc = mainPath[abs];
-  return cellPct(rc[0], rc[1]);
+  if (pos >= 51) { const rc = homeColumns[color][pos-51]; return cellPct(rc[0],rc[1]); }
+  const abs = (START_OFFSET[color]+pos) % 52;
+  return cellPct(mainPath[abs][0], mainPath[abs][1]);
 }
 
 function renderPieces() {
@@ -484,40 +715,32 @@ function renderPieces() {
       let el = document.querySelector(`.piece[data-color="${color}"][data-id="${idx}"]`);
       if (!el) {
         el = document.createElement('div');
-        el.className = 'piece ' + color + '-piece';
-        el.dataset.color = color;
-        el.dataset.id = idx;
-        el.textContent = color[0].toUpperCase() + (idx+1);
+        el.className = 'piece '+color+'-piece';
+        el.dataset.color = color; el.dataset.id = idx;
+        el.textContent = color[0].toUpperCase()+(idx+1);
         el.addEventListener('click', () => movePiece(color, idx));
         board.appendChild(el);
       }
       let coord;
-      if (pos === -1) {
-        const slot = homeSlots[color][idx];
-        coord = { left: slot[1], top: slot[0] };
-      } else {
-        coord = pieceCoord(color, pos);
-      }
-      el.style.left = coord.left + '%';
-      el.style.top = coord.top + '%';
+      if (pos === -1) { const slot = homeSlots[color][idx]; coord = { left:slot[1], top:slot[0] }; }
+      else coord = pieceCoord(color, pos);
+      el.style.left = coord.left+'%'; el.style.top = coord.top+'%';
     });
   });
 }
 
-const SAFE_RELATIVE_BY_ABS = SAFE_ABS;
 function checkCapture(movedColor, pos) {
   if (pos > 50) return;
-  const myAbs = (START_OFFSET[movedColor] + pos) % 52;
-  const isSafe = SAFE_RELATIVE_BY_ABS.includes(myAbs);
-  if (isSafe) return;
-  COLORS.forEach(otherColor => {
-    if (otherColor === movedColor) return;
-    state.positions[otherColor].forEach((otherPos, otherIdx) => {
+  const myAbs = (START_OFFSET[movedColor]+pos) % 52;
+  if (SAFE_ABS.includes(myAbs)) return;
+  COLORS.forEach(other => {
+    if (other === movedColor) return;
+    state.positions[other].forEach((otherPos, otherIdx) => {
       if (otherPos >= 0 && otherPos <= 50) {
-        const otherAbs = (START_OFFSET[otherColor] + otherPos) % 52;
+        const otherAbs = (START_OFFSET[other]+otherPos) % 52;
         if (otherAbs === myAbs) {
-          state.positions[otherColor][otherIdx] = -1;
-          showToast(`${COLOR_NAME_UR[otherColor]} کی گوٹی کٹ گئی! 💥`);
+          state.positions[other][otherIdx] = -1;
+          showToast(`${COLOR_NAME_UR[other]} کی گوٹی کٹ گئی! 💥`);
         }
       }
     });
@@ -526,44 +749,42 @@ function checkCapture(movedColor, pos) {
 
 function checkWin(color) {
   if (state.finished[color] === 4) {
+    const total = Object.values(state.coins).reduce((a,b)=>a+b,0);
+    state.coins[color] = total;
+    COLORS.forEach(c => { if (c!==color) state.coins[c]=0; });
+    updateWallet();
     document.getElementById('winnerText').textContent = `🎉 ${COLOR_NAME_UR[color]} جیت گیا!`;
+    document.getElementById('winnerInfo').innerHTML = `<p><strong>${PLAYER_NAMES[color]}</strong> نے جیت لیا</p><p>💰 کل جیتے: <strong>${total}</strong> کوائنز</p>`;
     document.getElementById('winnerOverlay').classList.add('show');
+    clearInterval(state.turnTimer);
   }
 }
 
 function movePiece(color, idx) {
   if (!state.rolled) { showToast('پہلے ڈائس دبائیں'); return; }
   if (color !== currentColor()) { showToast('یہ آپ کی باری نہیں'); return; }
-  const movable = movablePieces(color, state.diceValue);
+  const movable = movablePieces(color, state.diceValue[color]);
   if (!movable.includes(idx)) { showToast('یہ گوٹی ابھی نہیں چل سکتی'); return; }
 
   let pos = state.positions[color][idx];
-  pos = (pos === -1) ? 0 : pos + state.diceValue;
+  pos = (pos === -1) ? 0 : pos + state.diceValue[color];
   state.positions[color][idx] = pos;
 
-  if (pos === 57) {
-    state.finished[color]++;
-    showToast(`${COLOR_NAME_UR[color]} کی گوٹی گھر پہنچ گئی! 🏠`);
-  } else {
-    checkCapture(color, pos);
-  }
+  if (pos === 57) { state.finished[color]++; showToast(`${COLOR_NAME_UR[color]} کی گوٹی گھر پہنچ گئی! 🏠`); }
+  else checkCapture(color, pos);
 
   renderPieces();
-  updateScoreLine();
   document.querySelectorAll('.piece').forEach(p => p.classList.remove('movable'));
   checkWin(color);
 
-  const wasSix = state.diceValue === 6;
+  const wasSix = state.diceValue[color] === 6;
   state.rolled = false;
+  drawDice(color, 0);
 
   if (wasSix) {
     state.consecSixes++;
-    if (state.consecSixes >= 3) {
-      state.consecSixes = 0;
-      nextTurn();
-    } else {
-      document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]} کو دوبارہ چکا ملا (6) — ڈائس دبائیں`;
-    }
+    if (state.consecSixes >= 3) { state.consecSixes = 0; nextTurn(); }
+    else document.getElementById('statusText').textContent = `${COLOR_NAME_UR[color]} کو دوبارہ چکا ملا — ڈائس دبائیں`;
   } else {
     state.consecSixes = 0;
     nextTurn();
@@ -571,24 +792,19 @@ function movePiece(color, idx) {
 }
 
 function nextTurn() {
-  state.turnIndex = (state.turnIndex + 1) % COLORS.length;
-  state.diceValue = 0;
+  state.turnIndex = (state.turnIndex+1) % 4;
+  state.diceValue[currentColor()] = 0;
   state.rolled = false;
-  updateTurnBanner();
   document.getElementById('statusText').textContent = `${COLOR_NAME_UR[currentColor()]} کی باری — ڈائس دبائیں`;
+  startTurnTimer();
 }
 
-document.getElementById('diceBox').addEventListener('click', rollDice);
-document.getElementById('settingsBtn').addEventListener('click', ()=> showToast('Settings'));
-document.getElementById('trophyBtn').addEventListener('click', ()=> showToast('Leaderboard'));
-document.getElementById('bagBtn').addEventListener('click', ()=> showToast('Store'));
-document.getElementById('micToggle').addEventListener('click', ()=> showToast('Mic toggled'));
-document.getElementById('emojiBtn').addEventListener('click', ()=> showToast('Emoji picker'));
-document.getElementById('chatBtn').addEventListener('click', ()=> showToast('Chat opened'));
-
 renderPieces();
-updateTurnBanner();
-updateScoreLine();
+updateWallet();
+updateTurnDisplay();
+startTurnTimer();
+// Show 1 on all dice initially
+COLORS.forEach(c => drawDice(c, 1));
 </script>
 </body>
 </html>
