@@ -3,47 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ludo Play Arena</title>
+<title>Real Pak Ludo - Arena</title>
 <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    margin: 0; padding: 16px; background: #0b0214; color: #fff;
-    font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center;
+    margin: 0; padding: 12px; background: #0b0214; color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; align-items: center;
   }
-  .header-bar { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .ludo-board {
-    width: 360px; height: 360px; background: #ebdcb9; border: 4px solid #331404;
-    display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr);
-    position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  }
-  .zone { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; position: relative; }
+  .header-bar { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .game-title { font-weight: bold; color: #f3c623; font-size: 16px; }
   
-  /* Home Bases */
-  .red-home { grid-column: 1/7; grid-row: 1/7; background: #ff2a2a; border: 2px solid #333; }
-  .green-home { grid-column: 10/16; grid-row: 1/7; background: #12c140; border: 2px solid #333; }
-  .yellow-home { grid-column: 10/16; grid-row: 10/16; background: #f1bf12; border: 2px solid #333; }
-  .blue-home { grid-column: 1/7; grid-row: 10/16; background: #1282f1; border: 2px solid #333; }
-  .center-home { grid-column: 7/10; grid-row: 7/10; background: linear-gradient(45deg, red, green, blue, yellow); border: 1px solid #000; }
+  /* Package Info Banner */
+  .package-badge {
+    background: linear-gradient(135deg, #8e2de2, #4a00e0);
+    padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: bold;
+    margin-bottom: 10px; border: 1px solid #00f3ff; text-align: center; width: 100%; max-width: 380px;
+  }
 
-  /* Dice Controls */
   .control-box {
-    width: 100%; max-width: 400px; background: rgba(255,255,255,0.05);
-    margin-top: 15px; padding: 12px; border-radius: 12px; text-align: center;
+    width: 100%; max-width: 380px; background: rgba(255,255,255,0.06);
+    padding: 12px; border-radius: 16px; text-align: center; margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
   }
+  .p-indicator { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
+  .timer-banner { font-size: 13px; font-weight: bold; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 8px; }
   .dice-btn {
-    padding: 10px 24px; font-size: 16px; font-weight: bold; background: #f3c623;
-    border: none; border-radius: 8px; cursor: pointer; color: #000; margin-top: 6px;
+    padding: 10px 28px; font-size: 15px; font-weight: bold; background: linear-gradient(180deg, #fdd845, #f3c623);
+    border: none; border-radius: 10px; cursor: pointer; color: #000; margin-top: 5px; box-shadow: 0 4px 10px rgba(243,198,35,0.3);
   }
-  .btn-leave {
-    background: #ff3333; color: #fff; border: none; padding: 8px 16px;
-    border-radius: 6px; cursor: pointer; font-weight: bold;
+  .btn-leave { background: #ff3333; color: #fff; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
+
+  /* 15x15 GRID LUDO BOARD */
+  .ludo-container {
+    width: 360px; height: 360px; background: #fff; border: 4px solid #220b3a;
+    display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.6); border-radius: 4px; overflow: hidden;
   }
-  .timer-banner { font-size: 14px; font-weight: bold; padding: 4px 10px; border-radius: 5px; margin-bottom: 5px; display: inline-block; }
-  .p-indicator { font-size: 15px; font-weight: bold; margin-bottom: 8px; }
+  .cell { background: #fdfaf2; border: 0.5px solid #ccc; display: flex; align-items: center; justify-content: center; position: relative; }
   
-  /* Token Visuals */
+  /* Home Boxes */
+  .home-box { grid-span: 6; display: flex; align-items: center; justify-content: center; position: relative; }
+  .r-home { grid-column: 1/7; grid-row: 1/7; background: #ff2a2a; }
+  .g-home { grid-column: 10/16; grid-row: 1/7; background: #12c140; }
+  .b-home { grid-column: 1/7; grid-row: 10/16; background: #1282f1; }
+  .y-home { grid-column: 10/16; grid-row: 10/16; background: #f1bf12; }
+  
+  .inner-nest { width: 70%; height: 70%; background: #fff; border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; border: 2px solid #333; }
+  
+  /* Center Triangle */
+  .center-triangle { grid-column: 7/10; grid-row: 7/10; background: #ebdcb9; position: relative; border: 1px solid #333; }
+  .center-img {
+    width: 100%; height: 100%;
+    background: linear-gradient(45deg, #ff2a2a 50%, #12c140 50%), linear-gradient(135deg, #1282f1 50%, #f1bf12 50%);
+    background-size: 100% 100%; opacity: 0.9;
+  }
+
+  /* Specific Track Colors */
+  .bg-red { background: #ff2a2a !important; }
+  .bg-green { background: #12c140 !important; }
+  .bg-yellow { background: #f1bf12 !important; }
+  .bg-blue { background: #1282f1 !important; }
+  .cell-star::after { content: "⭐"; font-size: 10px; color: #777; position: absolute; }
+
+  /* Tokens */
   .token {
-    width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4); display: inline-block; margin: 2px;
+    width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5); display: inline-block; position: relative;
   }
   .t-red { background: #ff0000; }
   .t-green { background: #00ff00; }
@@ -54,36 +79,36 @@
 <body>
 
 <div class="header-bar">
-  <div id="gameTitleStatus" style="font-weight:bold; color:#f3c623;">Ludo Match Arena</div>
+  <div id="gameTitleStatus" class="game-title">Real Pak Ludo Arena</div>
   <button class="btn-leave" onclick="leaveMatch()" id="btnLeaveText">Leave Game</button>
 </div>
 
-<!-- Turn Status Panel -->
+<!-- پیکیج اور جوائننگ کی معلومات یہاں سامنے نظر آئیں گی -->
+<div class="package-badge" id="packageDisplay">
+  Loading Package Details...
+</div>
+
 <div class="control-box">
   <div id="turnDisplay" class="p-indicator">Player Turn: Red 🔴</div>
-  <div id="timerDisplay" class="timer-banner" style="background:#ff3333;">Time Left: 10s</div>
-  <br>
-  <div id="diceResult" style="font-size:24px; font-weight:bold; margin:6px 0;">🎲 ?</div>
+  <div id="timerDisplay" class="timer-banner" style="background:#ff3333; color:#fff;">Time Left: 10s</div>
+  <div id="diceResult" style="font-size:26px; font-weight:bold; margin:4px 0; color:#ffea79;">🎲 ?</div>
   <button class="dice-btn" id="btnRollDice" onclick="rollDice()">Roll Dice</button>
 </div>
 
-<!-- Mini Ludo Arena Structure -->
-<div style="margin-top:15px;">
-  <div class="ludo-board">
-    <div class="zone red-home" id="z-red"></div>
-    <div class="zone green-home" id="z-green"></div>
-    <div class="zone center-home"></div>
-    <div class="zone blue-home" id="z-blue"></div>
-    <div class="zone yellow-home" id="z-yellow"></div>
-  </div>
+<div class="ludo-container" id="boardGrid">
+  <div class="home-box r-home"><div class="inner-nest" id="nest-red"></div></div>
+  <div class="home-box g-home"><div class="inner-nest" id="nest-green"></div></div>
+  <div class="home-box b-home"><div class="inner-nest" id="nest-blue"></div></div>
+  <div class="home-box y-home"><div class="inner-nest" id="nest-yellow"></div></div>
+  <div class="center-triangle"><div class="center-img"></div></div>
 </div>
 
 <script>
-  // Extract configuration parameters dynamically from URL query
+  // URL سے ڈیٹا نکالنا (تاکہ پیکیج اور جوائننگ آپشنز برقرار رہیں)
   const urlParams = new URLSearchParams(window.location.search);
-  const mode = urlParams.get('mode') || 'practice';
-  const betValue = parseInt(urlParams.get('bet')) || 10;
-  const playersCount = parseInt(urlParams.get('players')) || 2; // Can be exactly 2 or 4
+  const mode = urlParams.get('mode') || 'Practice';
+  const betValue = urlParams.get('bet') || '0';
+  const playersCount = parseInt(urlParams.get('players')) || 2; 
   const lang = localStorage.getItem('ludo_lang5') || 'en';
 
   let playersSequence = [];
@@ -91,96 +116,88 @@
   let countdownTimer = null;
   let secondsRemaining = 10;
 
-  // Render language perfectly separate
+  function initMatchInfo() {
+    // پیکیج اور موڈ ڈسپلے سیٹ کرنا
+    const pkgBox = document.getElementById('packageDisplay');
+    if(lang === 'ur') {
+      pkgBox.innerHTML = `🏆 موڈ: <b>${mode}</b> | 💰 پیکیج انٹری: <b>${betValue} Coins</b> | 👥 کھلاڑی: <b>${playersCount}</b>`;
+    } else {
+      pkgBox.innerHTML = `🏆 Mode: <b>${mode}</b> | 💰 Package Bet: <b>${betValue} Coins</b> | 👥 Players: <b>${playersCount}</b>`;
+    }
+  }
+
   function initLanguage() {
     if(lang === 'ur') {
-      document.getElementById('gameTitleStatus').textContent = "لڈو پلے گراؤنڈ";
+      document.getElementById('gameTitleStatus').textContent = "حقیقی پاک لڈو ایرینا";
       document.getElementById('btnLeaveText').textContent = "گیم چھوڑیں";
       document.getElementById('btnRollDice').textContent = "ڈائس گھمائیں";
-      updateTurnTextUr();
-    } else {
-      document.getElementById('gameTitleStatus').textContent = "Ludo Match Arena";
-      document.getElementById('btnLeaveText').textContent = "Leave Game";
-      document.getElementById('btnRollDice').textContent = "Roll Dice";
-      updateTurnTextEn();
     }
   }
 
-  function updateTurnTextEn() {
-    const color = playersSequence[currentPlayerIdx];
-    document.getElementById('turnDisplay').textContent = `Player Turn: ${color.toUpperCase()}`;
-    document.getElementById('timerDisplay').textContent = `Time Left: ${secondsRemaining}s`;
-  }
+  function buildTracks() {
+    const grid = document.getElementById('boardGrid');
+    for (let r = 1; r <= 15; r++) {
+      for (let c = 1; c <= 15; c++) {
+        if (r <= 6 && c <= 6) continue;
+        if (r <= 6 && c >= 10) continue;
+        if (r >= 10 && c <= 6) continue;
+        if (r >= 10 && c >= 10) continue;
+        if (r >= 7 && r <= 9 && c >= 7 && c <= 9) continue;
 
-  function updateTurnTextUr() {
-    let colorName = playersSequence[currentPlayerIdx];
-    if(colorName === 'red') colorName = 'سرخ (Red)';
-    if(colorName === 'green') colorName = 'سبز (Green)';
-    if(colorName === 'yellow') colorName = 'پیلا (Yellow)';
-    if(colorName === 'blue') colorName = 'نیلا (Blue)';
-    
-    document.getElementById('turnDisplay').textContent = `باری: ${colorName}`;
-    document.getElementById('timerDisplay').textContent = `باقی وقت: ${secondsRemaining} سیکنڈ`;
-  }
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.style.gridRow = r;
+        cell.style.gridColumn = c;
 
-  // Setup strict active headcount sequence
-  function setupArena() {
-    if(playersCount === 2) {
-      playersSequence = ['red', 'green']; // Strictly two entities
-      document.getElementById('z-red').innerHTML = '<div class="token t-red"></div><div class="token t-red"></div>';
-      document.getElementById('z-green').innerHTML = '<div class="token t-green"></div><div class="token t-green"></div>';
-      document.getElementById('z-yellow').style.opacity = "0.2";
-      document.getElementById('z-blue').style.opacity = "0.2";
-    } else {
-      playersSequence = ['red', 'green', 'yellow', 'blue']; // Full four entities setup
-      document.getElementById('z-red').innerHTML = '<div class="token t-red"></div><div class="token t-red"></div>';
-      document.getElementById('z-green').innerHTML = '<div class="token t-green"></div><div class="token t-green"></div>';
-      document.getElementById('z-yellow').innerHTML = '<div class="token t-yellow"></div><div class="token t-yellow"></div>';
-      document.getElementById('z-blue').innerHTML = '<div class="token t-blue"></div><div class="token t-blue"></div>';
-    }
-    startTurnTimer();
-  }
+        // Tracks Color Setup
+        if (r === 7 && c === 2) cell.classList.add('bg-red', 'cell-star');
+        if (r === 8 && c >= 2 && c <= 6) cell.classList.add('bg-red');
+        if (r === 2 && c === 9) cell.classList.add('bg-green', 'cell-star');
+        if (c === 8 && r >= 2 && r <= 6) cell.classList.add('bg-green');
+        if (r === 9 && c === 14) cell.classList.add('bg-yellow', 'cell-star');
+        if (r === 8 && c >= 10 && c <= 14) cell.classList.add('bg-yellow');
+        if (r === 14 && c === 7) cell.classList.add('bg-blue', 'cell-star');
+        if (c === 8 && r >= 10 && r <= 14) cell.classList.add('bg-blue');
 
-  function startTurnTimer() {
-    clearInterval(countdownTimer);
-    secondsRemaining = 10; // Exactly 10 seconds auto turn limit
-    if(lang === 'en') { updateTurnTextEn(); } else { updateTurnTextUr(); }
-
-    countdownTimer = setInterval(() => {
-      secondsRemaining--;
-      if(lang === 'en') { updateTurnTextEn(); } else { updateTurnTextUr(); }
-
-      if(secondsRemaining <= 0) {
-        clearInterval(countdownTimer);
-        autoPassTurn(); // Pass token turn immediately
+        if ((r===3 && c===7) || (r===6 && c===13) || (r===13 && c===9) || (r===10 && c===3)) {
+          cell.classList.add('cell-star');
+        }
+        grid.appendChild(cell);
       }
-    }, 1000);
+    }
   }
 
-  function autoPassTurn() {
-    currentPlayerIdx = (currentPlayerIdx + 1) % playersSequence.length;
-    startTurnTimer();
+  function setupPlayers() {
+    if(playersCount === 2) {
+      playersSequence = ['red', 'green'];
+      document.getElementById('nest-red').innerHTML = '<div class="token t-red"></div><div class="token t-red"></div>';
+      document.getElementById('nest-green').innerHTML = '<div class="token t-green"></div><div class="token t-green"></div>';
+      document.getElementById('nest-yellow').parentElement.style.opacity = "0.2";
+      document.getElementById('nest-blue').parentElement.style.opacity = "0.2";
+    } else {
+      playersSequence = ['red', 'green', 'yellow', 'blue'];
+      document.getElementById('nest-red').innerHTML = '<div class="token t-red"></div>';
+      document.getElementById('nest-green').innerHTML = '<div class="token t-green"></div>';
+      document.getElementById('nest-yellow').innerHTML = '<div class="token t-yellow"></div>';
+      document.getElementById('nest-blue').innerHTML = '<div class="token t-blue"></div>';
+    }
   }
 
+  // باقی کا لاجک سمپل رولنگ کے لیے
   function rollDice() {
     const val = Math.floor(Math.random() * 6) + 1;
-    const icons = ["🎲 1", "🎲 2", "🎲 3", "🎲 4", "🎲 5", "🎲 6"];
-    document.getElementById('diceResult').textContent = icons[val - 1];
-    
-    // Move to next player turn configuration
-    currentPlayerIdx = (currentPlayerIdx + 1) % playersSequence.length;
-    startTurnTimer();
+    document.getElementById('diceResult').textContent = `🎲 ${val}`;
   }
 
   function leaveMatch() {
-    clearInterval(countdownTimer);
-    alert(lang === 'en' ? "You left the match! Match losses applied." : "آپ نے میچ چھوڑ دیا! رقم منہا کر دی گئی ہے۔");
-    window.location.href = 'index.html'; // Safe fallback redirect back to core panel
+    window.location.href = 'index.html';
   }
 
   window.onload = function() {
+    buildTracks();
     initLanguage();
-    setupArena();
+    initMatchInfo();
+    setupPlayers();
   };
 </script>
 </body>
