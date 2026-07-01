@@ -1,1 +1,237 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Ball Pool Game</title>
+    <style>
+        body {
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        canvas {
+            background-color: #0a5c1e;
+            border: 15px solid #5c3a21;
+            border-radius: 10px;
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.5);
+            display: block;
+            margin: 20px auto;
+            cursor: crosshair;
+        }
+        p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
 
+    <h1>8 بال پول گیم (پروٹوٹائپ)</h1>
+    <p>ماؤس کو گھما کر <strong>نشانہ</strong> لگائیں، اور کلک کر کے <strong>پاور</strong> کے ساتھ ہٹ کریں۔</p>
+    
+    <canvas id="poolTable" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById("poolTable");
+        const ctx = canvas.getContext("2d");
+
+        // گیم اسٹیٹس
+        let mouse = { x: 0, y: 0, isDown: false };
+        let power = 0;
+
+        // بال کلاس
+        class Ball {
+            constructor(x, y, color, number) {
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.radius = 12;
+                this.color = color;
+                this.number = number;
+                this.friction = 0.985; // رگڑ (ٹیبل پر بال کو روکنے کے لیے)
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+
+                // بال کا نمبر لکھنا
+                if (this.number !== 0) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius / 2, 0, Math.PI * 2);
+                    ctx.fillStyle = "white";
+                    ctx.fill();
+                    ctx.closePath();
+
+                    ctx.fillStyle = "black";
+                    ctx.font = "10px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(this.number, this.x, this.y);
+                }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+
+                // اگر اسپیڈ بہت کم ہو تو روک دیں
+                if (Math.abs(this.vx) < 0.1) this.vx = 0;
+                if (Math.abs(this.vy) < 0.1) this.vy = 0;
+
+                // بارڈر سے ٹکرانا (Wall Collision)
+                if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
+                    this.vx *= -1;
+                    this.x = this.x - this.radius < 0 ? this.radius : canvas.width - this.radius;
+                }
+                if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
+                    this.vy *= -1;
+                    this.y = this.y - this.radius < 0 ? this.radius : canvas.height - this.radius;
+                }
+            }
+        }
+
+        // بالز کی لسٹ
+        let balls = [];
+
+        // سفید بال (Cue Ball)
+        let cueBall = new Ball(200, 200, "white", 0);
+        balls.push(cueBall);
+
+        // دوسری بالز کو ترتیب دینا (Triangle Setup)
+        let colors = ["yellow", "blue", "red", "purple", "orange", "green", "maroon", "black"];
+        let startX = 550;
+        let startY = 200;
+        let row = 0;
+        let col = 0;
+        let ballCount = 1;
+
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j <= i; j++) {
+                let x = startX + i * 22;
+                let y = startY - (i * 12) + j * 24;
+                let color = colors[ballCount % colors.length];
+                if (i === 2 && j === 1) color = "black"; // 8 نمبر بال سینٹر میں
+                balls.push(new Ball(x, y, color, ballCount++));
+            }
+        }
+
+        // ماؤس ایونٹس
+        canvas.addEventListener("mousemove", (e) => {
+            let rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener("mousedown", () => { mouse.isDown = true; });
+        canvas.addEventListener("mouseup", () => {
+            if (mouse.isDown && cueBall.vx === 0 && cueBall.vy === 0) {
+                // ہٹ کرنے کی پاور اور اینگل کا حساب
+                let angle = Math.atan2(mouse.y - cueBall.y, mouse.x - cueBall.x);
+                let force = 15; // فکسڈ فورس (آپ اسے متحرک بھی کر سکتے ہیں)
+                
+                cueBall.vx = Math.cos(angle) * force;
+                cueBall.vy = Math.sin(angle) * force;
+            }
+            mouse.isDown = false;
+        });
+
+        // بالز کے آپس میں ٹکرانے کی فزکس (Elastic Collision)
+        function handleCollisions() {
+            for (let i = 0; i < balls.length; i++) {
+                for (let j = i + 1; j < balls.length; j++) {
+                    let b1 = balls[i];
+                    let b2 = balls[j];
+
+                    let dx = b2.x - b1.x;
+                    let dy = b2.y - b1.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < b1.radius + b2.radius) {
+                        // ٹکراؤ کا اینگل
+                        let angle = Math.atan2(dy, dx);
+                        let sin = Math.sin(angle);
+                        let cos = Math.cos(angle);
+
+                        // پوزیشنز کو اوورلیپ ہونے سے بچانا
+                        let overlap = (b1.radius + b2.radius) - distance;
+                        b1.x -= cos * overlap / 2;
+                        b1.y -= sin * overlap / 2;
+                        b2.x += cos * overlap / 2;
+                        b2.y += sin * overlap / 2;
+
+                        // ویلوسٹی روٹیشن
+                        let vx1 = b1.vx * cos + b1.vy * sin;
+                        let vy1 = b1.vy * cos - b1.vx * sin;
+                        let vx2 = b2.vx * cos + b2.vy * sin;
+                        let vy2 = b2.vy * cos - b2.vx * sin;
+
+                        // ویلوسٹی کا تبادلہ (Elastic Collision)
+                        let temp = vx1;
+                        vx1 = vx2;
+                        vx2 = temp;
+
+                        // واپس نارمل پوزیشن پر لانا
+                        b1.vx = vx1 * cos - vy1 * sin;
+                        b1.vy = vy1 * cos + vx1 * sin;
+                        b2.vx = vx2 * cos - vy2 * sin;
+                        b2.vy = vy2 * cos + vx2 * sin;
+                    }
+                }
+            }
+        }
+
+        // گیم لوپ (Main Game Loop)
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // ٹیبل کا گرین کلر دوبارہ ڈرا کرنا
+            ctx.fillStyle = "#0a5c1e";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // بالز کو اپڈیٹ اور ڈرا کرنا
+            balls.forEach(ball => {
+                ball.update();
+                ball.draw();
+            });
+
+            handleCollisions();
+
+            // کیو اسٹک (Cue Stick) اور گائیڈ لائن ڈرا کرنا (صرف تب جب سفید بال رکی ہوئی ہو)
+            if (cueBall.vx === 0 && cueBall.vy === 0) {
+                ctx.beginPath();
+                ctx.moveTo(cueBall.x, cueBall.y);
+                ctx.lineTo(mouse.x, mouse.y);
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+
+                // کیو اسٹک کا لکیر (Stick Backside)
+                let angle = Math.atan2(mouse.y - cueBall.y, mouse.x - cueBall.x);
+                ctx.beginPath();
+                ctx.moveTo(cueBall.x - Math.cos(angle) * 30, cueBall.y - Math.sin(angle) * 30);
+                ctx.lineTo(cueBall.x - Math.cos(angle) * 200, cueBall.y - Math.sin(angle) * 200);
+                ctx.strokeStyle = "#8B4513";
+                ctx.lineWidth = 5;
+                ctx.stroke();
+                ctx.closePath();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // گیم شروع کریں
+        gameLoop();
+    </script>
+</body>
+</html>
